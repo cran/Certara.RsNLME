@@ -1,0 +1,15 @@
+test(){
+    dosepoint(Aa)
+    C = A1 / V
+    deriv(Aa =  -  Ka * Aa)
+    deriv(A1 =  Ka * Aa  -  Cl * C)
+    error(CEps=1)
+    observe(CObs=C + CEps)
+    stparm(Ka = tvKa * exp(nKa))
+    stparm(V = tvV * exp(nV))
+    stparm(Cl = tvCl * exp(nCl))
+    fixef( tvKa = c(,1,))
+    fixef( tvV = c(,1,))
+    fixef( tvCl = c(,1,))
+    ranef(diag(nKa,nV,nCl) =  c(1,1,1))
+}

@@ -1,0 +1,67 @@
+Gender,Scenario,Label,nV,nCl,nV2,nCl2
+female,dVdBodyWeight,Omega
+female,dVdBodyWeight,nV,4.43123143239173,0,0,0
+female,dVdBodyWeight,nCl,0,2.91762119623122,0,0
+female,dVdBodyWeight,nV2,0,0,5.62201679458883,0
+female,dVdBodyWeight,nCl2,0,0,0,3.78210179390089
+female,dVdBodyWeight,Correlation
+female,dVdBodyWeight,nV,1,0,0,0
+female,dVdBodyWeight,nCl,0,1,0,0
+female,dVdBodyWeight,nV2,0,0,1,0
+female,dVdBodyWeight,nCl2,0,0,0,1
+female,dVdBodyWeight,Shrinkage,0.847650011788199,0.744768606515339,0.966627799163638,0.834394034365001
+female,dCldBodyWeight,Omega
+female,dCldBodyWeight,nV,4.43203221952632,0,0,0
+female,dCldBodyWeight,nCl,0,2.91777515085911,0,0
+female,dCldBodyWeight,nV2,0,0,5.62287965000844,0
+female,dCldBodyWeight,nCl2,0,0,0,3.78279057476067
+female,dCldBodyWeight,Correlation
+female,dCldBodyWeight,nV,1,0,0,0
+female,dCldBodyWeight,nCl,0,1,0,0
+female,dCldBodyWeight,nV2,0,0,1,0
+female,dCldBodyWeight,nCl2,0,0,0,1
+female,dCldBodyWeight,Shrinkage,0.847413430605952,0.746552311084237,0.9666294763685,0.834411494172845
+female,dVdBodyWeight dCldBodyWeight,Omega
+female,dVdBodyWeight dCldBodyWeight,nV,4.43189365035837,0,0,0
+female,dVdBodyWeight dCldBodyWeight,nCl,0,2.91770247630511,0,0
+female,dVdBodyWeight dCldBodyWeight,nV2,0,0,5.62274619228606,0
+female,dVdBodyWeight dCldBodyWeight,nCl2,0,0,0,3.78268860545312
+female,dVdBodyWeight dCldBodyWeight,Correlation
+female,dVdBodyWeight dCldBodyWeight,nV,1,0,0,0
+female,dVdBodyWeight dCldBodyWeight,nCl,0,1,0,0
+female,dVdBodyWeight dCldBodyWeight,nV2,0,0,1,0
+female,dVdBodyWeight dCldBodyWeight,nCl2,0,0,0,1
+female,dVdBodyWeight dCldBodyWeight,Shrinkage,0.847643650962365,0.746550727801905,0.966629156793312,0.8344088471951
+male,dVdBodyWeight,Omega
+male,dVdBodyWeight,nV,4.1385437518308,0,0,0
+male,dVdBodyWeight,nCl,0,2.37210896900101,0,0
+male,dVdBodyWeight,nV2,0,0,5.45713929855507,0
+male,dVdBodyWeight,nCl2,0,0,0,4.16280037135597
+male,dVdBodyWeight,Correlation
+male,dVdBodyWeight,nV,1,0,0,0
+male,dVdBodyWeight,nCl,0,1,0,0
+male,dVdBodyWeight,nV2,0,0,1,0
+male,dVdBodyWeight,nCl2,0,0,0,1
+male,dVdBodyWeight,Shrinkage,0.868626174440237,0.729287425374898,0.954628161040607,0.874619691447112
+male,dCldBodyWeight,Omega
+male,dCldBodyWeight,nV,4.14717031955745,0,0,0
+male,dCldBodyWeight,nCl,0,2.37487071782867,0,0
+male,dCldBodyWeight,nV2,0,0,5.46787124052655,0
+male,dCldBodyWeight,nCl2,0,0,0,4.17089710107602
+male,dCldBodyWeight,Correlation
+male,dCldBodyWeight,nV,1,0,0,0
+male,dCldBodyWeight,nCl,0,1,0,0
+male,dCldBodyWeight,nV2,0,0,1,0
+male,dCldBodyWeight,nCl2,0,0,0,1
+male,dCldBodyWeight,Shrinkage,0.868772217968155,0.731587073257503,0.954669211293397,0.874737832037359
+male,dVdBodyWeight dCldBodyWeight,Omega
+male,dVdBodyWeight dCldBodyWeight,nV,4.14742354670131,0,0,0
+male,dVdBodyWeight dCldBodyWeight,nCl,0,2.37496922161913,0,0
+male,dVdBodyWeight dCldBodyWeight,nV2,0,0,5.46820675993233,0
+male,dVdBodyWeight dCldBodyWeight,nCl2,0,0,0,4.17114634668707
+male,dVdBodyWeight dCldBodyWeight,Correlation
+male,dVdBodyWeight dCldBodyWeight,nV,1,0,0,0
+male,dVdBodyWeight dCldBodyWeight,nCl,0,1,0,0
+male,dVdBodyWeight dCldBodyWeight,nV2,0,0,1,0
+male,dVdBodyWeight dCldBodyWeight,nCl2,0,0,0,1
+male,dVdBodyWeight dCldBodyWeight,Shrinkage,0.868809469612406,0.731594900790109,0.95467074374167,0.874741745248262

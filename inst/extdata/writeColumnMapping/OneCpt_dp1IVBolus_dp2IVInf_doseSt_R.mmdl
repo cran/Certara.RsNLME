@@ -1,0 +1,43 @@
+## Description: one-compartment model with dosepoint1 being IV bolus and dosepoint2 being IV infusion 
+##
+##				The model is fitted using the model using the default values for the relevant NLME engine arguments.
+##
+## 				Note: 	the default values for the relevant NLME engine arguments are chosen based on the model, type ?engineParams for details.
+##       				For example, for this example, FOCE-ELS is the default method for estimation, and Sandwich is the default method for
+##       				standard error calculations.
+
+
+## DATA OneCpt_dosepoint1IVBolus_dosepoint2IVInfusion.csv
+
+## MAP id = Subject time A1_1 = Dose1 CObs = DV
+
+## COLDEF
+dose2(A1 <- "Dose2", "Rate")
+
+## MODEL
+test(){
+	deriv(A1 = - Cl * C)
+	dosepoint(A1)
+	dosepoint2(A1, tlag = 12)
+	C = A1 / V
+	
+	##===========================================
+	## Residual error model
+	##===========================================
+	error(CEps = 0.1)
+	observe(CObs = C * (1 + CEps))
+	
+	##===========================================
+	## Model parameters
+	##===========================================
+	stparm(V = tvV * exp(nV))
+	stparm(Cl = tvCl * exp(nCl))
+	fixef(tvV = c(, 5, )) # true value: 4.5
+	fixef(tvCl = c(, 1, )) # true value: 1.2
+	ranef(diag(nV, nCl) = c(1, 1)) # true value: c(0.1, 0.1)
+}
+
+
+## ESTARGS
+# numIterations = 1
+# stdErr = "None"

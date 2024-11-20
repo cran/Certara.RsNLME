@@ -1,0 +1,36 @@
+## Based on: OneCpt_1stOrderAbsorp_SteadyState_FOCE-ELS.R
+## Description: ONE COMPARTMENT MODEL WITH FIRST ORDER ABSORPTION
+## Author: user
+
+## DATA1 pkCovs.csv
+## MAP1 id=Subject time= Act_Time A1 = Amount Sex = Gender(female = 0, male=1) Age BW=BodyWeight CObs=Conc
+group ("first_group" = 1 "second_group" = 2 "third_group" = 3)
+# covr(Sex<-"Gender"("female"=0, "male"=1))
+
+## MODEL
+test(){
+    cfMicro(A1,Cl/V, Cl2/V, Cl2/V2)
+    dosepoint(A1)
+    C = A1 / V
+    error(CEps=0.1)
+    observe(CObs=C * ( 1 + CEps))
+    stparm(V = tvV * (Age^dVdAge)   * ((BW/70)^dVdBW)   * exp(nV))
+    stparm(Cl = tvCl * exp(dCldSex1*(Sex==1)) * ((BW/70)^dCldBW)   * exp(nCl))
+    stparm(V2 = tvV2 * exp(nV2))
+    stparm(Cl2 = tvCl2 * exp(nCl2))
+    fcovariate(Sex())
+    fcovariate(Age)
+    fcovariate(BW)
+    fcovariate(group())
+    fixef( tvV = c(,16,))
+    fixef( tvCl = c(,7,))
+    fixef( tvV2 = c(,41,))
+    fixef( tvCl2 = c(,14,))
+    fixef( dVdAge(enable=c(0)) = c(,0,))
+    fixef( dVdBW(enable=c(1)) = c(,0,))
+    fixef( dCldSex1(enable=c(2)) = c(,0,))
+    fixef( dCldBW(enable=c(3)) = c(,0,))
+    ranef(diag(nV,nCl,nV2,nCl2) =  c(1,1,1,1))
+}
+
+

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<progress>
+  <MachineName>LocalHost</MachineName>
+  <ParallelProtocol>Multicore</ParallelProtocol>
+  <ModelName>dVdBodyWeightdCldBodyWeightdVd</ModelName>
+  <StartTime>May 2021 10 5:15:27 AM</StartTime>
+  <EndTime>May 2021 10 5:15:47 AM</EndTime>
+  <Status>Finished</Status>
+  <NumOfSamples>6</NumOfSamples>
+  <NumOfSamplesCompleted>6</NumOfSamplesCompleted>
+  <NumOfSamplesFailed>0</NumOfSamplesFailed>
+  <NumOfSamplesExpired>0</NumOfSamplesExpired>
+  <NumOfSamplesErrored>0</NumOfSamplesErrored>
+  <ProgressStage/>
+  <DetailInfoLine1>
+Finished summarizing results. Transferring data and loading the results...
+</DetailInfoLine1>
+  <DetailInfoLine2>Generating posthoc.csv and table0n.csv</DetailInfoLine2>
+  <DetailInfoLine3/>
+</progress>

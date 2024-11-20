@@ -1,0 +1,20 @@
+test(){
+    C2 = A2/V2
+    dosepoint(A1)
+    C = A1 / V
+    deriv(A1 =  -  Cl * C  -  Cl2 * (C - C2))
+    deriv(A2 =  Cl2 * (C - C2))
+    error(CEps=1)
+    observe(CObs=C + CEps)
+    stparm(V = tvV * exp(nV + nVx0*(Occasion==0) + nVx1*(Occasion==1) + nVx2*(Occasion==2) ))
+    stparm(Cl = tvCl * exp(nCl + nClx0*(Occasion==0) + nClx1*(Occasion==1) + nClx2*(Occasion==2) ))
+    stparm(V2 = tvV2 * exp(nV2 + nV2x0*(Occasion==0) + nV2x1*(Occasion==1) + nV2x2*(Occasion==2) ))
+    stparm(Cl2 = tvCl2 * exp(nCl2 + nCl2x0*(Occasion==0) + nCl2x1*(Occasion==1) + nCl2x2*(Occasion==2) ))
+    fcovariate(Occasion())
+    fixef( tvV = c(,1,))
+    fixef( tvCl = c(,1,))
+    fixef( tvV2 = c(,1,))
+    fixef( tvCl2 = c(,1,))
+    ranef(diag(nV,nCl,nV2,nCl2) =  c(1,1,1,1))
+    ranef(diag(nVx0,nV2x0,nV3x0,nClx0,nCl2x0) = c(1,1,1,1,1), same(nVx1,nV2x1,nV3x1,nClx1,nCl2x1), same(nVx2,nV2x2,nV3x2,nClx2,nCl2x2))
+}

@@ -1,0 +1,6 @@
+id("Subject")
+covr(C<-"CObs")
+obs(EObs<-"Response")
+table(file="posthoc.csv", covr(C), IC50, E0, mode=keep)
+
+

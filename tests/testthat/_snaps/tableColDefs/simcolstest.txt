@@ -1,0 +1,1 @@
+simtbl(file="simTable1.csv", dose(Aa), obs(CObs), C, mode = keep)

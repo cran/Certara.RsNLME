@@ -1,0 +1,22 @@
+##DATA1 data1.txt
+
+##MAP1
+
+##COLDEF
+id("Subject")
+covr(C<-"CObs")
+obs(EObs<-"Response")
+
+
+## MODEL
+test(){
+	covariate(C)
+	E = E0 * (1 - C / (IC50 + C))
+	error(EEps = 1)
+	observe(EObs(C) = E + EEps)
+	stparm(IC50 = (tvIC50) * exp(nIC50))
+	stparm(E0 = (tvE0) * exp(nE0))
+	fixef(tvIC50 = c(, 25, ))
+	fixef(tvE0 = c(, 50, ))
+	ranef(diag(nIC50, nE0) = c(0.05, 0.05))
+}

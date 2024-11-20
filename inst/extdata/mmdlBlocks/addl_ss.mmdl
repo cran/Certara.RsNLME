@@ -1,0 +1,35 @@
+
+
+## DATA addl_ssDF.csv
+## MAP id time Aa = dose_Aa CObs
+## DOSING CYCLE
+SS=ss1 Dosepoint = Aa Delta = 5 Amount = 10 Duration = 5
+ADDL=addl1 Dosepoint = Aa Delta = 5 Amount = 10
+## MODEL
+test(){
+    cfMicro(A1, Cl/V, first = (Aa = Ka))
+    dosepoint(Aa)
+    C = A1 / V
+
+	##---------------------------------------------------------------------------------
+	## Residual error model
+	##---------------------------------------------------------------------------------
+    error(CEps = 0.1)
+    observe(CObs = C * ( 1 + CEps))
+
+	##---------------------------------------------------------------------------------
+	## Model parameters
+	##---------------------------------------------------------------------------------
+	## Structural parameters
+    stparm(Ka = tvKa * exp(nKa))
+    stparm(V = tvV * exp(nV))
+    stparm(Cl = tvCl * exp(nCl))
+
+	## Fixed effects
+    fixef(tvKa = c(, 1 ,))
+    fixef(tvV = c(, 10 ,))
+    fixef(tvCl = c(, 2 ,))
+
+	## Random Effects
+    ranef(diag(nKa, nV, nCl) =  c(1, 1, 1))
+}

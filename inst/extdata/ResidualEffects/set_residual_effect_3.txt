@@ -1,0 +1,14 @@
+test(){
+cfMicro(A1,Cl/V)
+dosepoint(A1)
+C=A1/V
+error(CEps(freeze)=0.16)
+observe(CObs=C+CEps*(1+C*CMixRatio))
+stparm(V=tvV*exp(nV))
+stparm(Cl=tvCl*exp(nCl))
+stparm(CMixRatio=tvCMixRatio)
+fixef(tvV=c(,1,))
+fixef(tvCl=c(,1,))
+fixef(tvCMixRatio=c(,1,))
+ranef(diag(nV,nCl)=c(1,1))
+}

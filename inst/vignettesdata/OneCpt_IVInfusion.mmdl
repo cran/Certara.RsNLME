@@ -1,0 +1,25 @@
+## Description: A one-compartment model with IV infusion
+
+# The model is fitted using the default FOCE-ELS engine.
+# Note: the default values for the relevant NLME engine arguments are chosen based on the model, type ?engineParams for details.
+
+## DATA OneCpt_IVInfusion.csv
+## MAP id = Subject time = Time A1 = Dose A1_Rate = Rate CObs
+
+## MODEL
+test(){
+	cfMicro(A1, Cl / V)
+	dosepoint(A1)
+	C = A1 / V
+	error(CEps = 0.1)
+	observe(CObs = C * (1 + CEps))
+	stparm(V = tvV * exp(nV))
+	stparm(Cl = tvCl * exp(nCl))
+	fixef(tvV = c(, 5, ))
+	fixef(tvCl = c(, 1, ))
+	ranef(diag(nV, nCl) = c(1, 1))
+}
+
+## ESTARGS
+numIterations = 1 # one iteration only
+stdErr = "None" # no standard error estimation requested
