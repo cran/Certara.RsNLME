@@ -17,6 +17,15 @@ Returns named character vector of theta values by parsing PML fixed effect state
 }
 \examples{
 \donttest{
-getThetas(pkpdmodel)
+model <- emaxmodel(
+  checkBaseline = TRUE,
+  checkFractional = TRUE,
+  checkInhibitory = TRUE,
+  data = pkpdData,
+  ID = "ID",
+  C = "CObs",
+  EObs = "EObs"
+)
+getThetas(model)
 }
 }

@@ -15,11 +15,33 @@
 \code{NULL}
 }
 \description{
-Reads progress file and prints out its contents
+Reads progress file and prints out its contents.
+Applicable to remote jobs or jobs running in backgroud.
 }
 \examples{
 \donttest{
-  print(jobHandle)
+model <- pkmodel(
+  parameterization = "Clearance",
+  numCompartments = 2,
+  data = pkData,
+  ID = "Subject",
+  Time = "Act_Time",
+  A1 = "Amount",
+  CObs = "Conc",
+  workingDir = tempdir()
+  )
+ host <- hostParams(sharedDirectory = tempdir(),
+                    parallelMethod = "None",
+                    hostName = "local",
+                    numCores = 1)
+if (.Platform$OS.type == "unix") {
+# background is not supported on Windows
+  job <- fitmodel(model,
+                  numIterations = 3,
+                  hostPlatform = host,
+                  runrunInBackground = TRUE)
+  print(job)
+}
 }
 }
 \keyword{internal}

@@ -12,10 +12,9 @@
 #' addTablesToColumnMapping(model, simParams, Tables, filename)
 #' }
 #'
-#' @export
 #' @return Table class objects specified to \code{Tables} argument.
 #' @keywords internal
-#'
+#' @noRd
 addTablesToColumnMapping <- function(model, Tables, filename, forSim = TRUE) {
   if (length(Tables) == 0) {
     return(NULL)

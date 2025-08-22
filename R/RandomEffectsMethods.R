@@ -302,6 +302,7 @@ setMethod(
 #'
 #' @param .Object   PK/PD model
 #' @keywords internal
+#' @noRd
 #'
 setGeneric(
   name = "initializeRandomEffectsBlock",
@@ -389,6 +390,7 @@ updateValue2 <- function(randomValues, effName, effName2, value) {
 #' @param .Object   PK/PD model
 #'
 #' @keywords internal
+#' @noRd
 setGeneric(
   name = "randomOccasionalBlockStatement",
   def = function(.Object) {
@@ -410,19 +412,28 @@ setMethod(
           effects == 1 # Added to generate ran eff statement for only effects that are enabled
         values <- c@catEffInitValues
         effects <- effects[isEnabled]
-        values <- values[isEnabled]
-        names <- names(effects)
+        values <- unlist(c@catEffInitValues[isEnabled])
+        stParmNames <- names(effects)
+        names(values) <- stParmNames
         new_values <- c()
 
         if (length(effects) > 0) {
           if (length(effects) == length(values)) {
-            for (eff_name in names) {
-              name <- paste0("n", eff_name, "x", items[[1]]@value)
+            # diagonal
+            for (eff_name in stParmNames) {
+              name <- paste0("n", eff_name, "x", c@name, items[[1]]@value)
               variables <- c(variables, name)
+              new_value <- lookupValue(.Object@randomValues, name)
+              if (length(new_value) == 0) {
+                # not found in the random matrix; will use the initial value
+                new_value <- values[[eff_name]]
+              }
+
               new_values <-
                 c(new_values,
-                  lookupValue(.Object@randomValues, name))
+                  new_value)
             }
+
             occasion_ranef_statement <- paste0(
               "    ranef(diag(",
               paste(as.character(variables), collapse = ","),
@@ -431,20 +442,28 @@ setMethod(
               ")"
             )
           } else {
-            for (i in 1:length(names)) {
-              name <- paste0("n", names[[i]], "x", items[[1]]@value)
-              variables <- c(variables, name)
-              for (j in 1:i) {
-                if (i == j) {
-                  val <- lookupValue(.Object@randomValues, name)
-                } else {
-                  name2 <- paste0("n", names[[j]], "x", items[[1]]@value)
-                  val <-
-                    lookupValue2(.Object@randomValues, name, name2)
+            # block
+            if (all(stParmNames %in% colnames(.Object@randomValues@values))) {
+              for (i in 1:length(stParmNames)) {
+                name <- paste0("n", stParmNames[[i]], "x", c@name, items[[1]]@value)
+                variables <- c(variables, name)
+                for (j in 1:i) {
+                  if (i == j) {
+                    val <- lookupValue(.Object@randomValues, name)
+                  } else {
+                    name2 <- paste0("n", stParmNames[[j]], "x", items[[1]]@value)
+                    val <-
+                      lookupValue2(.Object@randomValues, name, name2)
+                  }
+                  new_values <- c(new_values, val)
                 }
-                new_values <- c(new_values, val)
               }
+            } else {
+              # will use default since some (all) values are not in random matrix
+              variables <- paste0("n", stParmNames, "x", c@name, items[[1]]@value)
+              new_values <- values
             }
+
             occasion_ranef_statement <- paste0(
               "    ranef(block(",
               paste(as.character(variables), collapse = ","),
@@ -457,8 +476,9 @@ setMethod(
           if (length(items) > 1) {
             for (i in 2:length(items)) {
               variables <- c()
-              for (indx in 1:length(names)) {
-                name <- paste0("n", names[[indx]], "x", items[[i]]@value)
+              for (indx in 1:length(stParmNames)) {
+                name <-
+                  paste0("n", stParmNames[[indx]], "x", c@name, items[[i]]@value)
                 variables <- c(variables, name)
               }
               occasion_ranef_statement <- paste0(
@@ -473,7 +493,7 @@ setMethod(
           occasion_ranef_statement <-
             paste0(occasion_ranef_statement, ")")
           statement <-
-            paste0(statement, occasion_ranef_statement)
+            c(statement, occasion_ranef_statement)
         }
       }
     }

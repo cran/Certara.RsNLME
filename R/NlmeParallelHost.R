@@ -145,38 +145,39 @@
     hostPlatform
   }
 
-#' Class initializer for NlmeParallelHost
+#' NlmeParallelHost Class
 #'
-#' NLME Parallel Host object class. Class represents an NLME parallel host which
-#' can either be local or remote.
+#' This class defines an NLME parallel host, which can be either local or
+#' remote, for running jobs.
 #'
 #' @include NlmeUserAuthentication.R
 #' @include NlmeParallelMethod.R
-#' @slot sharedDirectory Directory in which the run happens. If it is
-#'   given as UNC path on Windows, a PS Drive will be mapped within powershell
-#'   command to any free Disk letter on local machine where execution performed
-#'   (not applicable to remote executions). After execution PS Drive will be
-#'   removed. A warning will be given if removal is unsuccessful.
-#' @slot installationDirectory Directory containing NLME libraries/scripts
-#' @slot hostName Visual name of the host(default local)
-#' @slot machineName IP address or name of the host(default local)
-#' @slot hostType `windows` or `linux`. For remote runs it is possible to point
-#' the distro suppported, i.e. `RHEL8` or `UBUNTU2204`. In such case the
-#' corresponding `PML_BIN_DIR` variable will be created and NLME Engine libraries
-#' will be looked in `installationDirectory/{$PML_BIN_DIR}`.
-#' @slot numCores Number of compute cores
-#' @slot isLocal Is this a local `TRUE` or remote `FALSE` host?
-#' @slot rLocation Path to Rscript executable on remote host;
-#'   ignored on local host
-#' @slot scriptPath a path to the script to be executed before
-#'   starting Rscript within Certara.NLME8 package on the remote host. Ignored
-#'   when running locally.
-#' @slot userAuthentication User credential for remote system. See
-#'   [NlmeUserAuthentication()]
-#' @slot parallelMethod Options are:
-#'   `None|Multicore|LOCAL_MPI|SGE|SGE_MPI|TORQUE|`
-#'   `TORQUE_MPI|LSF|LSF_MPI|SLURM|SLURM_MPI`. Supply argument using
-#'   `NlmeParallelMethod("LOCAL_MPI")` for example.
+#'
+#' @slot sharedDirectory `character`. The directory where the run will take place.
+#'   On Windows, UNC paths are mapped to a drive letter for local execution.
+#' @slot installationDirectory `character`. The directory containing NLME
+#'   libraries and scripts.
+#' @slot hostName `character`. A user-friendly name for the host (e.g., "local_mpi").
+#' @slot machineName `character`. The IP address or hostname of the machine.
+#'   Defaults to the local system's node name.
+#' @slot hostType `character`. The operating system of the host, either
+#'   `"windows"` or `"linux"`. For remote Linux systems, you can specify a
+#'   supported distribution (e.g., `"RHEL"`, `"UBUNTU"`) to configure the
+#'   `PML_BIN_DIR` environment variable. `linux` will be treated as `"RHEL"`.
+#' @slot numCores `numeric`. The number of compute cores to be used.
+#' @slot isLocal `logical`. `TRUE` if the host is local, `FALSE` if remote.
+#' @slot rLocation `character`. The path to the Rscript executable on a remote
+#'   host. This is ignored for local runs.
+#' @slot scriptPath `character`. The path to a script to execute on the remote
+#'   host before Rscript is started. This is ignored for local runs.
+#' @slot userAuthentication `NlmeUserAuthentication`. An object containing user
+#'   credentials for remote host authentication. See [NlmeUserAuthentication()].
+#' @slot parallelMethod `NlmeParallelMethod`. The parallel computing method to
+#'   use (e.g., `"LOCAL_MPI"`, `"SGE"`, `"TORQUE"`). See [NlmeParallelMethod()].
+#'
+#' @md
+#' @keywords NLME NlmeParallelHost internal
+#' @export NlmeParallelHost
 #'
 #' @examples
 #' host <- hostParams(
@@ -184,11 +185,6 @@
 #'   hostName = "local_mpi",
 #'   numCores = 4
 #' )
-#'
-#' @md
-#' @keywords NLME NlmeParallelHost internal
-#'
-#' @export NlmeParallelHost
 #'
 NlmeParallelHost <-
   setClass(
@@ -242,8 +238,16 @@ setMethod("initialize", "NlmeParallelHost",
 
               if (grepl("windows", hostType, ignore.case = TRUE)) {
                 hostType <- "windows"
-              } else if (grepl("(linux)|(unix)", hostType, ignore.case = TRUE)) {
+              } else if (grepl("(^linux$)|(^unix$)", hostType, ignore.case = TRUE)) {
                 hostType <- "linux"
+              } else if (grepl("UBUNTU2204", hostType, ignore.case = TRUE)) {
+                warning("UBUNTU2204 as a hostType is deprecated. Use `UBUNTU` instead.")
+                hostType <- "UBUNTU"
+              } else if (grepl("RHEL8", hostType, ignore.case = TRUE)) {
+                warning("RHEL8 as a hostType is deprecated. Use `RHEL` instead.")
+                hostType <- "RHEL"
+              } else if (!toupper(hostType) %in% c("RHEL", "UBUNTU")) {
+                stop("hostType ", hostType, " is not supported; supported are `Windows`, `RHEL`, `UBUNTU`.")
               }
             }
 
@@ -266,13 +270,19 @@ setMethod("initialize", "NlmeParallelHost",
             .Object
           })
 
-#' Print method for NlmeParallelHost class
+#' Print an NlmeParallelHost Object
 #'
-#' This method prints the information of an NlmeParallelHost object.
+#' Prints a summary of the configuration of an `NlmeParallelHost` object.
 #'
-#' @param x An NlmeParallelHost object.
-#' @param ... Additional arguments passed to the print function.
+#' @param x An `NlmeParallelHost` object to print.
+#' @param ... Additional arguments passed to the `print` function.
 #'
+#' @return `NULL`. This function is called for its side effect of printing
+#'   to the console.
+#'
+#' @md
+#' @keywords internal
+#' @export
 #'
 #' @examples
 #' host <- NlmeParallelHost(
@@ -280,21 +290,17 @@ setMethod("initialize", "NlmeParallelHost",
 #'   installationDirectory = "~/nlme/",
 #'   hostName = "my_host",
 #'   machineName = "192.168.1.100",
-#'   hostType = "RHEL8",
+#'   hostType = "RHEL",
 #'   numCores = 8,
 #'   isLocal = FALSE,
 #'   rLocation = "/usr/bin/R",
 #'   scriptPath = "/path/to/script.R",
-#'   userAuthentication = NlmeUserAuthentication(userName = "myuser", userPassword = "mypassword"),
+#'   userAuthentication =
+#'     NlmeUserAuthentication(userName = "myuser", userPassword = "mypassword"),
 #'   parallelMethod = NlmeParallelMethod("SGE_MPI")
 #' )
 #'
 #' print(host)
-#'
-#' @md
-#' @keywords internal
-#' @return `NULL`
-#' @export
 #'
 print.NlmeParallelHost <- function(x, ...) {
   cat("\n NLME Parallel Host \n ------------------------------------------- \n")
@@ -306,7 +312,8 @@ print.NlmeParallelHost <- function(x, ...) {
           "\nShared Directory slot is empty, as well as NLME_ROOT_DIRECTORY;",
           "current working directory will be used.\n"
         )
-        sharedDirectory <- normalizePath(".", winslash = "/", mustWork = FALSE)
+        sharedDirectory <-
+          normalizePath(".", winslash = "/", mustWork = FALSE)
       } else {
         cat("\nNLME_ROOT_DIRECTORY environment variable will be used.\n")
         sharedDirectory <- Sys.getenv("NLME_ROOT_DIRECTORY")

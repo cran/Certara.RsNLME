@@ -28,8 +28,10 @@ pkmodel(
   ID = "Subject",
   Time = "Act_Time",
   A1 = "Amount",
-  CObs = "Conc") |>
+  CObs = "Conc",
+  workingDir = tempdir())
 addDoseCycle(
+  model,
   name = "A1",
   amount = 30000,
   II = 24,

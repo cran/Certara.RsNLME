@@ -44,6 +44,7 @@ Macro1 <- 4
 #' \donttest{
 #' NlmeModelParameterization(PARAM_CLEARANCE)
 #' }
+#' @noRd
 #' @keywords internal
 setClass(
   "NlmeModelParameterization",

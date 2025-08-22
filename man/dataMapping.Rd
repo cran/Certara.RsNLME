@@ -18,7 +18,8 @@ Modified \code{NlmePmlModel} object
 Used to initialize input data for PK/PD model
 }
 \examples{
-model <- pkmodel(columnMap = FALSE)
+model <- pkmodel(columnMap = FALSE,
+                 workingDir = tempdir())
 
 model <- dataMapping(model, pkData)
 

@@ -8,9 +8,13 @@
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
 #' \donttest{
-#' model <- pkmodel(columnMap = FALSE)
+#' model <- pkmodel(columnMap = FALSE,
+#'                  workingDir = tempdir())
 #'
-#' newModel <- editModel(model)
+#' if (FALSE) {
+#'   # will open an additional window with the model text:
+#'   newModel <- editModel(model)
+#' }
 #' }
 #'
 #' @export

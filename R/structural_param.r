@@ -8,15 +8,13 @@ STP_EXP_SUM <- 4
 Log <- 4
 STP_ILOGIT <- 5
 Logit <- 5
-STP_CUSTOM <- 6
-Custom <- 6
 
 Block <- 1
 Diagonal <- 2
 
 
 StructParamTypeNames <-
-  c("LogNormal", "Normal", "Combination", "Log", "Logit", "Custom")
+  c("LogNormal", "Normal", "Combination", "Log", "Logit")
 
 #' Class represents style of structural parameter
 #'
@@ -24,7 +22,7 @@ StructParamTypeNames <-
 #'
 #' @slot  style    Parameter style: 1=LogNormal, 2=Normal,
 #'                                  3=Combination, 4=Log,
-#'                                  5=Logit, 6=Custom
+#'                                  5=Logit
 #'
 #' @name NlmeStrucParamStyle
 #' @rdname NlmeStrucParamStyle
@@ -51,7 +49,7 @@ setMethod("initialize", "NlmeStrucParamStyle",
 #' @param randomEffName    Name to use for random effects
 #' @param hasRandomEffect  Does the parameter have a random effect?
 #' @param style            Parameter style:
-#'                           LogNormal, Normal, Combination, Log, Logit, Custom
+#'                           LogNormal, Normal, Combination, Log, Logit
 #' @param initialValue     Initial value for the parameter
 #' @param lowerBound       Lower limit for the parameter value
 #' @param upperBound       Upper limit for the parameter value
@@ -67,6 +65,8 @@ setMethod("initialize", "NlmeStrucParamStyle",
 #' NlmeStructuralParameter(STP_SUM_ETA, "EC50")
 #' NlmeStructuralParameter(STP_SUM_EXP, "Imax")
 #' }
+#'
+#' @noRd
 #' @keywords internal
 NlmeStructuralParameter <- setClass(
   "NlmeStructuralParameter",

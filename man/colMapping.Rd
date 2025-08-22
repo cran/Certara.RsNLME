@@ -27,7 +27,8 @@ Piping compatible function for \code{modelColumnMapping} used to add column mapp
 \examples{
 pkData$id2 <- pkData$Subject
 model <- pkmodel(columnMap = FALSE,
-                 data = pkData)
+                 data = pkData,
+                 workingDir = tempdir())
 
 modelvar <- unlist(modelVariableNames(model))
 

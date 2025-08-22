@@ -19,6 +19,15 @@ Use to add MDV statement to \code{model@userDefinedExtraDefs}
 }
 \examples{
 \donttest{
+pkData1 <- pkData
+pkData1$MDV <- 0
+model <- pkmodel(data = pkData1,
+                 ID = "Subject",
+                 Time = "Act_Time",
+                 A1 = "Amount",
+                 CObs = "Conc",
+                 workingDir = tempdir()
+                 )
 model <- addMDV(model, MDV = "MDV")
 }
 }

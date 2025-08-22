@@ -60,7 +60,6 @@ test_that("Test multiple block effects initialization", {
   )
 })
 
-
 test_that("Test specify initialization with missing variable ", {
   model <- pkmodel(
     isPopulation = TRUE,
@@ -85,10 +84,14 @@ test_that("Test specify initialization with missing variable ", {
       "ranef(diag(nV,nCl)=c(0.2,0.09),diag(nV2,nCl2)(freeze)=c(1,1))"
     )
   )
+
+  expect_no_error(randomEffect(
+    pkmodel(columnMap = FALSE, data = NULL),
+    effect = c("nV", "nCl"),
+    value = c(2.8900, -1.2410, 8.9429),
+    isDiagonal = FALSE
+  ))
 })
-
-
-
 
 test_that(
   "Updated random effect names using structuralParameter() appear in random effects block",

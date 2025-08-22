@@ -4,49 +4,45 @@
 \name{NlmeParallelHost-class}
 \alias{NlmeParallelHost-class}
 \alias{NlmeParallelHost}
-\title{Class initializer for NlmeParallelHost}
+\title{NlmeParallelHost Class}
 \description{
-NLME Parallel Host object class. Class represents an NLME parallel host which
-can either be local or remote.
+This class defines an NLME parallel host, which can be either local or
+remote, for running jobs.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{sharedDirectory}}{Directory in which the run happens. If it is
-given as UNC path on Windows, a PS Drive will be mapped within powershell
-command to any free Disk letter on local machine where execution performed
-(not applicable to remote executions). After execution PS Drive will be
-removed. A warning will be given if removal is unsuccessful.}
+\item{\code{sharedDirectory}}{\code{character}. The directory where the run will take place.
+On Windows, UNC paths are mapped to a drive letter for local execution.}
 
-\item{\code{installationDirectory}}{Directory containing NLME libraries/scripts}
+\item{\code{installationDirectory}}{\code{character}. The directory containing NLME
+libraries and scripts.}
 
-\item{\code{hostName}}{Visual name of the host(default local)}
+\item{\code{hostName}}{\code{character}. A user-friendly name for the host (e.g., "local_mpi").}
 
-\item{\code{machineName}}{IP address or name of the host(default local)}
+\item{\code{machineName}}{\code{character}. The IP address or hostname of the machine.
+Defaults to the local system's node name.}
 
-\item{\code{hostType}}{\code{windows} or \code{linux}. For remote runs it is possible to point
-the distro suppported, i.e. \code{RHEL8} or \code{UBUNTU2204}. In such case the
-corresponding \code{PML_BIN_DIR} variable will be created and NLME Engine libraries
-will be looked in \verb{installationDirectory/\{$PML_BIN_DIR\}}.}
+\item{\code{hostType}}{\code{character}. The operating system of the host, either
+\code{"windows"} or \code{"linux"}. For remote Linux systems, you can specify a
+supported distribution (e.g., \code{"RHEL"}, \code{"UBUNTU"}) to configure the
+\code{PML_BIN_DIR} environment variable. \code{linux} will be treated as \code{"RHEL"}.}
 
-\item{\code{numCores}}{Number of compute cores}
+\item{\code{numCores}}{\code{numeric}. The number of compute cores to be used.}
 
-\item{\code{isLocal}}{Is this a local \code{TRUE} or remote \code{FALSE} host?}
+\item{\code{isLocal}}{\code{logical}. \code{TRUE} if the host is local, \code{FALSE} if remote.}
 
-\item{\code{rLocation}}{Path to Rscript executable on remote host;
-ignored on local host}
+\item{\code{rLocation}}{\code{character}. The path to the Rscript executable on a remote
+host. This is ignored for local runs.}
 
-\item{\code{scriptPath}}{a path to the script to be executed before
-starting Rscript within Certara.NLME8 package on the remote host. Ignored
-when running locally.}
+\item{\code{scriptPath}}{\code{character}. The path to a script to execute on the remote
+host before Rscript is started. This is ignored for local runs.}
 
-\item{\code{userAuthentication}}{User credential for remote system. See
-\code{\link[=NlmeUserAuthentication]{NlmeUserAuthentication()}}}
+\item{\code{userAuthentication}}{\code{NlmeUserAuthentication}. An object containing user
+credentials for remote host authentication. See \code{\link[=NlmeUserAuthentication]{NlmeUserAuthentication()}}.}
 
-\item{\code{parallelMethod}}{Options are:
-\verb{None|Multicore|LOCAL_MPI|SGE|SGE_MPI|TORQUE|}
-\code{TORQUE_MPI|LSF|LSF_MPI|SLURM|SLURM_MPI}. Supply argument using
-\code{NlmeParallelMethod("LOCAL_MPI")} for example.}
+\item{\code{parallelMethod}}{\code{NlmeParallelMethod}. The parallel computing method to
+use (e.g., \code{"LOCAL_MPI"}, \code{"SGE"}, \code{"TORQUE"}). See \code{\link[=NlmeParallelMethod]{NlmeParallelMethod()}}.}
 }}
 
 \examples{

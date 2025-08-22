@@ -23,7 +23,9 @@ set_Xchmod <- function() {
 #'
 #' @examples
 #' \donttest{
-#' createModelInfo(model)
+#'   model <- pkmodel(columnMap = FALSE,
+#'                    workingDir = tempdir())
+#'   createModelInfo(model)
 #' }
 #'
 #' @export

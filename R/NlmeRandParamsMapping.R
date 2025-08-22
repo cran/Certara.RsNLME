@@ -4,6 +4,7 @@
 #'
 #'
 #' @keywords internal
+#' @noRd
 setClass("NlmeRandParamsMapping",
          slots = c(
            mapping = "list"

@@ -44,11 +44,13 @@ This function checks for the presence of the necessary
 }
 \examples{
 \donttest{
-  result <- obtain_NLMELicense("C:/Program Files/Certara/NLME_Engine", verbose = TRUE)
-  if (result) {
-    message("License obtained successfully!")
-  } else {
-    message("Failed to obtain license.")
-  }
+INSTALLDIR <- Sys.getenv("INSTALLDIR")
+if (INSTALLDIR == "") INSTALLDIR <- "C:/Program Files/Certara/NLME_Engine"
+result <- obtain_NLMELicense(INSTALLDIR, verbose = TRUE)
+if (result) {
+  message("License obtained successfully!")
+} else {
+  message("Failed to obtain license.")
+}
 }
 }

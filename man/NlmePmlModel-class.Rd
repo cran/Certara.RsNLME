@@ -80,7 +80,13 @@ and table generation}
 
 \examples{
 \donttest{
-NlmePmlModel()
+# helper class
+setClass("NlmePmlModelInfo",
+         slots = c(modelName = "character",
+                   workingDir = "character"))
+Model <-
+  new("NlmePmlModel",
+  modelInfo = new("NlmePmlModelInfo", modelName = "Model", workingDir = "."))
 }
 
 }

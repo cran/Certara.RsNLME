@@ -1,0 +1,4 @@
+# removeCovariate works for occasion block
+
+    "test(){\n    cfMicro(A1,Cl/V, Cl2/V, Cl2/V2, Cl3/V, Cl3/V3)\n    dosepoint(A1)\n    C = A1 / V\n    error(CEps=0.1)\n    observe(CObs=C * ( 1 + CEps))\n    stparm(V = tvV * exp(nV + nVxOCC10*(OCC1==0) + nVxOCC11*(OCC1==1)))\n    stparm(Cl = tvCl * exp(nCl))\n    stparm(V2 = tvV2 * exp(nV2 + nV2xOCC10*(OCC1==0) + nV2xOCC11*(OCC1==1)))\n    stparm(Cl2 = tvCl2 * exp(nCl2))\n    stparm(V3 = tvV3 * exp(nV3))\n    stparm(Cl3 = tvCl3 * exp(nCl3))\n    fcovariate(OCC1)\n    fixef( tvV = c(,1,))\n    fixef( tvCl = c(,1,))\n    fixef( tvV2 = c(,1,))\n    fixef( tvCl2 = c(,1,))\n    fixef( tvV3 = c(,1,))\n    fixef( tvCl3 = c(,1,))\n    ranef(diag(nV,nCl,nV2,nCl2,nV3,nCl3) =  c(1,1,1,1,1,1))\n    ranef(block(nVxOCC10,nV2xOCC10) = c(0.1,0.031,0.3), same(nVxOCC11,nV2xOCC11))\n}"
+

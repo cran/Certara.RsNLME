@@ -31,8 +31,13 @@ denotes the name of the covariate, and \code{"BodyWeight"} is the name of the
 corresponding column in the input dataset.}
 
 \item{effect}{Name of structural parameter(s) on which the covariate
-has an effect.  Specify \code{effect} as character or character vector if the
-covariate has an effect on multiple structural parameters.}
+has an effect. Specify \code{effect} as character or character vector if the
+covariate has an effect on multiple structural parameters.
+\strong{Important for Occasion Covariates:} When modifying an \emph{existing}
+occasion covariate (e.g., changing \code{option} or \code{values}), you must
+list \emph{all} structural parameters currently affected by this occasion
+covariate in the \code{effect} argument, even those whose effect relationship
+is not being changed in this specific call.}
 
 \item{type}{Type of covariate. Options are \code{"Continuous"},
 \code{"Categorical"}, \code{"Occasion"}.}
@@ -41,14 +46,24 @@ covariate has an effect on multiple structural parameters.}
 value is given). Options are \code{"Forward"}, \code{"Interpolate"}, \code{"Backward"},
 where \code{"Interpolate"} is only applicable to \code{type = "Continuous"}.}
 
-\item{option}{Options are \code{"Yes"}, \code{"PlusOne"}, or \code{"No"}, where
-\code{option = "No"} will remove the covariate effect from the specified
-structural parameter(s), but retain the covariate in the model. Note:
-\code{option = "PlusOne"} is only applicable to continuous and categorical
-covariates in the case where structural parameters have \code{style = "LogNormal"}. Multiple options are not supported (i.e. all covariate
-effects in the call are supposed to have the same \code{option}. If different
-\code{option}s are required for different covariate effects, sequential calls of
-current method could be done.}
+\item{option}{Options are \code{"Yes"}, \code{"PlusOne"}, or \code{"No"}.
+\itemize{
+\item \code{"Yes"}: Apply the covariate effect using the standard method
+(multiplicative for LogNormal style, additive for Normal style).
+\item \code{"PlusOne"}: Apply the covariate effect using the "1 + effect"
+formulation. This is only applicable to continuous and categorical
+covariates where the affected structural parameter has \code{style = "LogNormal"}.
+\item \code{"No"}: Remove the specified covariate effect from the specified
+structural parameter(s). The covariate itself (and its definition,
+e.g., \code{fcovariate(Occ1)}) remains part of the model, but the link
+between this covariate and the specified parameter(s) in the \code{stparm()}
+statement is removed. See the note for the \code{effect} argument regarding
+occasion covariates.
+Multiple options are not supported within a single call (i.e., all
+covariate effects listed in the \code{effect} argument for a single call must
+use the same \code{option}). If different \code{option}s are required, use sequential
+calls to \code{addCovariate}.
+}}
 
 \item{center}{Centering method. Options are \code{"Mean"}, \code{"Median"},
 \code{"Value"} or \code{"None"}. Only applicable to covariate \code{type = "Continuous"}.
@@ -106,7 +121,8 @@ model <- pkmodel(
   ID = "Subject",
   Time = "Act_Time",
   A1 = "Amount",
-  CObs = "Conc"
+  CObs = "Conc",
+  workingDir = tempdir()
 )
 
 # Add Gender covariate of type categorical

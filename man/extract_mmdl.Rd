@@ -49,7 +49,9 @@ are going next.
 \examples{
 \donttest{
 # path to metamodel should be specified, all other arguments set to default
-extract_mmdl("metamodel.mmdl")
+extract_mmdl(system.file("extdata/mmdlNoTime", "test.mmdl",
+                              package = "Certara.RsNLME"),
+             directoryToExtract = tempdir())
 }
 
 }

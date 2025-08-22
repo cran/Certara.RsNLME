@@ -12,7 +12,7 @@ Class represents style of structural parameter
 \describe{
 \item{\code{style}}{Parameter style: 1=LogNormal, 2=Normal,
 3=Combination, 4=Log,
-5=Logit, 6=Custom}
+5=Logit}
 }}
 
 \keyword{internal}

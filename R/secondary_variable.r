@@ -14,6 +14,7 @@
 #'                                 "CalcTMax(tvA,tvAlpha,tvB,tvBeta,C,Gamma)")
 #'                                 }
 #'
+#' @noRd
 #' @keywords internal
 SecondaryParameter= setClass("SecondaryParameter",
     slots = c(

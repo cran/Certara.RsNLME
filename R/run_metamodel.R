@@ -31,14 +31,13 @@
 #'
 #' @examples
 #' \donttest{
-#' # path to metamodel should be specified
-#' host <- hostParams(
-#'   parallelMethod = "LOCAL_MPI",
-#'   hostName = "local_mpi",
-#'   numCores = 4
-#' )
-#' directoryToRun <- normalizePath("./NLME/")
-#' run_metamodel("metamodel.mmdl", directoryToRun)
+#' mmdlfile <- system.file("extdata/mmdlNoTime/test.mmdl",
+#'                        package = "Certara.RsNLME",
+#'                        mustWork = TRUE)
+#' directoryToRun <- file.path(tempdir(TRUE), "MmdlNoTimeTest")
+#' # using default host
+#' mmdlResults <- run_metamodel(mmdlfile = mmdlfile,
+#'                              directoryToRun = directoryToRun)
 #' }
 #'
 #' @seealso NlmeParallelHost, fitmodel
@@ -201,15 +200,24 @@ run_metamodel <-
 #'
 #' @return
 #' the \code{NlmeParallelHost} class object is returned.
-#' @export
-#' @keywords internal
 #' @examples
 #' \donttest{
 #' # path nlme_hostPath should be specified
+#'  nlme_hostPath <- tempfile()
+#'  host1 <- paste0('{"profile_name":"Multicore",',
+#'   '"hostname":"127.0.0.1",',
+#'   '"cores_number":4,',
+#'   '"parallel_mode":"MULTICORE"}')
+#'  host2 <- paste0('{"profile_name":"MPI",',
+#'  '"hostname":"127.0.0.1",',
+#'  '"cores_number":8,',
+#'  '"parallel_mode":"LOCAL_MPI"}')
 #'
-#' host <- parse_NLMEHosts(nlme_hostPath)
+#' writeLines(paste0("[", host1, ",", host2, "]"), nlme_hostPath)
+#' hosts <- parse_NLMEHosts(nlme_hostPath)
 #' }
-# see NlmeParallelHost class for description of slots used
+#' @export
+#' @keywords internal
 parse_NLMEHosts <- function(nlme_hostPath) {
   nlme_hosts <- jsonlite::read_json(nlme_hostPath)
   hosts <- c()
@@ -248,8 +256,6 @@ parse_NLMEHosts <- function(nlme_hostPath) {
     stop("OS platform for the remote host ",
          machineName,
          " is not specified.")
-  } else if (grepl("unix|linux", hostType, ignore.case = TRUE)) {
-    hostType <- "linux"
   } else if (grepl("windows", hostType, ignore.case = TRUE)) {
     hostType <- "windows"
   }
@@ -274,7 +280,7 @@ parse_NLMEHosts <- function(nlme_hostPath) {
 
   knownMethods <- .get_supportedMethods(hostType)
 
-  if (is.null(parallelMethod)) {
+  if (length(parallelMethod) == 0) {
     warning("parallelMethod is not given in the host selected;",
             "\nresetting to none",
             call. = FALSE)

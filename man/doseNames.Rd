@@ -16,7 +16,8 @@ Character vector of dose names defined in model
 Use to return character vector of dose point names in model object.
 }
 \examples{
-model <- pkmodel(columnMap = FALSE)
+model <- pkmodel(columnMap = FALSE,
+                 workingDir = tempdir())
 
 doses <- doseNames(model)
 

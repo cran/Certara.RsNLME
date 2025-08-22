@@ -22,6 +22,22 @@ pharmacokinetic/pharmacodynamic (PK/PD) model.
 }
 \examples{
 \donttest{
+model <- pkmodel(
+  numCompartments = 2,
+  data = pkData,
+  ID = "Subject",
+  Time = "Act_Time",
+  A1 = "Amount",
+  CObs = "Conc",
+  workingDir = tempdir()
+)
+model <- addCovariate(model,
+  covariate = "Gender",
+  type = "Categorical",
+  effect = c("V2", "Cl2"),
+  levels = c(0, 1),
+  labels = c("Female", "Male")
+)
 listCovariateEffectNames(model)
 }
 }

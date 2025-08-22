@@ -1,6 +1,6 @@
 Package: Certara.RsNLME
 Title: Pharmacometric Modeling
-Version: 3.0.1
+Version: 3.1.0
 Authors@R: c(person("James", "Craig", email = "james.craig@certara.com", role = c("aut", "cre")),
       person("Michael", "Tomashevskiy", email = "michael.tomashevskiy@certara.com", role = c("aut")),
       person("Vitalii", "Nazarov", email = "vitalii.nazarov@certara.com", role = c("aut")),
@@ -12,9 +12,10 @@ Description: Facilitate Pharmacokinetic (PK) and Pharmacodynamic (PD) modeling
     and simulation with powerful tools for Nonlinear Mixed-Effects (NLME)
     modeling. The package provides access to the same advanced Maximum Likelihood
     algorithms used by the NLME-Engine in the Phoenix platform. These tools support
-    a range of analyses, from parametric methods to individual and pooled data
-    analysis <https://www.certara.com/app/uploads/2020/06/BR_PhoenixNLME-v4.pdf>.
-    Execution is supported both locally or on remote machines.
+    a range of analyses, from parametric methods to individual and pooled data, and
+    support integrated use within the Pirana pharmacometric workbench
+    <doi:10.1002/psp4.70067>. Execution is supported both locally or on
+    remote machines.
 Depends: R (>= 4.0)
 License: LGPL-3
 URL: https://certara.github.io/R-RsNLME/
@@ -60,7 +61,7 @@ Collate: 'BootstrapParams.R' 'NlmeParallelMethod.R'
         'structural_param.r' 'tableParams.R' 'update_PMLwithThetas.R'
         'vpc.r' 'writeColumnMapping.R' 'writeDefaultFiles.R'
 NeedsCompilation: no
-Packaged: 2024-11-19 15:11:50 UTC; jcraig
+Packaged: 2025-08-20 15:11:59 UTC; jcraig
 Author: James Craig [aut, cre],
   Michael Tomashevskiy [aut],
   Vitalii Nazarov [aut],
@@ -69,4 +70,4 @@ Author: James Craig [aut, cre],
   Certara USA, Inc. [cph, fnd]
 Maintainer: James Craig <james.craig@certara.com>
 Repository: CRAN
-Date/Publication: 2024-11-20 11:20:02 UTC
+Date/Publication: 2025-08-22 06:40:13 UTC

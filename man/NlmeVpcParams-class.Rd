@@ -37,13 +37,32 @@ Class initializer for arguments of visual predictive check (VPC) runs
 }
 \examples{
 \donttest{
+model <- pkmodel(
+  parameterization = "Clearance",
+  numCompartments = 2,
+  data = pkData,
+  ID = "Subject",
+  Time = "Act_Time",
+  A1 = "Amount",
+  CObs = "Conc",
+  workingDir = tempdir()
+  )
 
-job <- fitmodel(model)
+# Define the host
+host <- hostParams(parallelMethod = "NONE",
+                   hostName = "local",
+                   numCores = 1,
+                   sharedDirectory = tempdir())
+job <- fitmodel(model,
+                hostPlatform = host)
 
 # View estimation results
 print(job)
 
-finalModelVPC <- copyModel(model, acceptAllEffects = TRUE, modelName = "model_VPC")
+finalModelVPC <- copyModel(model,
+                           acceptAllEffects = TRUE,
+                           modelName = "model_VPC",
+                           workingDir = tempdir())
 
 # View the model
 print(finalModelVPC)
@@ -52,9 +71,11 @@ print(finalModelVPC)
 vpcSetup <- NlmeVpcParams(outputPRED = TRUE)
 
 # Run VPC using the default host, default values for the relevant NLME engine arguments
-finalVPCJob <- vpcmodel(model = finalModelVPC, vpcParams = vpcSetup)
+finalVPCJob <-
+  vpcmodel(model = finalModelVPC, vpcParams = vpcSetup, )
 
 }
+
 }
 \seealso{
 \code{\link{tableParams}, \link{NlmeSimTableDef}, \link{NlmeObservationVar}}

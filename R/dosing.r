@@ -271,10 +271,18 @@ print.ExtraDoseOption <- function(x, ...) {
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
 #' \donttest{
+#' pkData1 <- pkData
+#' pkData1$MDV <- 0
+#' model <- pkmodel(data = pkData1,
+#'                  ID = "Subject",
+#'                  Time = "Act_Time",
+#'                  A1 = "Amount",
+#'                  CObs = "Conc",
+#'                  workingDir = tempdir()
+#'                  )
 #' model <- addMDV(model, MDV = "MDV")
 #' }
 #' @export
-
 addMDV <- function(.Object, MDV) {
   existing_def <- .Object@userDefinedExtraDefs
 
@@ -308,7 +316,19 @@ addMDV <- function(.Object, MDV) {
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
 #' \donttest{
-#' model <- addADDL(model, ADDL = "addl", II = "ii")
+#' pkData1 <- pkData
+#' pkData1$ii <- 0
+#' pkData1$addl <- 0
+#'  model <- pkmodel(numComp = 2,
+#'                   absorption = "FirstOrder",
+#'                   ID = "Subject",
+#'                   Time = "Act_Time",
+#'                   CObs = "Conc",
+#'                   Aa = "Amount",
+#'                   data = pkData1,
+#'                   modelName = "PkModel",
+#'                   workingDir = tempdir())
+#'  model <- addADDL(model, ADDL = "addl", II = "ii")
 #' }
 #'
 #' @export
@@ -355,7 +375,17 @@ addADDL <- function(.Object, ADDL, II) {
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
 #' \donttest{
-#' model <- addSteadyState(model, SS = "ss", II = "ii")
+#' pkData1 <- pkData
+#' pkData1$SS <- 0
+#' pkData1$II <- 0
+#' model <- pkmodel(data = pkData1,
+#'                  ID = "Subject",
+#'                  Time = "Act_Time",
+#'                  A1 = "Amount",
+#'                  CObs = "Conc",
+#'                  workingDir = tempdir()
+#'                  )
+#' model <- addSteadyState(model, SS = "SS", II = "II")
 #' }
 #' @export
 addSteadyState <- function(.Object, SS, II, SSOffset = NULL) {
@@ -431,8 +461,13 @@ addSteadyState <- function(.Object, SS, II, SSOffset = NULL) {
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
 #' \donttest{
-#' model <- pkmodel(columnMap = FALSE) %>%
-#'   addDoseCycle(type = "SteadyState", name = "A1", amount = "Amount", II = "II")
+#' model <- addDoseCycle(pkmodel(columnMap = FALSE,
+#'                               isPopulation = FALSE,
+#'                               workingDir = tempdir()),
+#'                       type = "SteadyState",
+#'                       name = "A1",
+#'                       amount = "Amount",
+#'                       II = "II")
 #' }
 #'
 #' @export
@@ -574,7 +609,8 @@ addDoseCycle <- function(.Object,
 #' @param model Model object
 #'
 #' @examples
-#' model <- pkmodel(columnMap = FALSE)
+#' model <- pkmodel(columnMap = FALSE,
+#'                  workingDir = tempdir())
 #'
 #' doses <- doseNames(model)
 #'
@@ -604,8 +640,10 @@ doseNames <- function(model) {
 #'   ID = "Subject",
 #'   Time = "Act_Time",
 #'   A1 = "Amount",
-#'   CObs = "Conc") |>
+#'   CObs = "Conc",
+#'   workingDir = tempdir())
 #' addDoseCycle(
+#'   model,
 #'   name = "A1",
 #'   amount = 30000,
 #'   II = 24,
@@ -664,8 +702,10 @@ extraDoseNames <- function(model) {
 #'   ID = "Subject",
 #'   Time = "Act_Time",
 #'   A1 = "Amount",
-#'   CObs = "Conc") |>
+#'   CObs = "Conc",
+#'   workingDir = tempdir())
 #' addDoseCycle(
+#'   model,
 #'   name = "A1",
 #'   amount = 30000,
 #'   II = 24,
@@ -840,6 +880,8 @@ DosePointNames <- c("No", "RateDose", "DurationDose")
 #'   bioavailExpression = "logitF1;ilogit(logitF1)"
 #' )
 #' }
+#'
+#' @noRd
 #' @keywords internal
 setClass("DosePoint",
   slots = c(

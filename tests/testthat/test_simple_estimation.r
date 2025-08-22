@@ -3,8 +3,6 @@ test_that("class running a simple population estimation", {
   testthat::skip_if(Sys.getenv("INSTALLDIR") == "",
                     message = "cannot start the test, INSTALLDIR variable is not specified.")
 
-  testthat::skip()
-
   NLME_ROOT_DIRECTORY <-
     file.path(tempdir(TRUE), "Simplefit Test")
   dir.create(NLME_ROOT_DIRECTORY)

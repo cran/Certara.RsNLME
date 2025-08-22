@@ -1,12 +1,28 @@
 #' Accepts all estimates for fixed effects, Sigma, and random effects
 #'
-#' Updates PML statements in model object with estimates returned from model execution. Use \code{\link{copyModel}} and set
-#' argument \code{acceptAllEffects = TRUE} to create new model object with final estimates from base model run.
+#' Updates PML statements in model object with estimates returned from model
+#' execution. Use \code{\link{copyModel}} and set argument
+#' \code{acceptAllEffects = TRUE} to create new model object with final
+#' estimates from base model run.
 #'
 #' @param model Model object
 #'
 #' @examples
 #' \donttest{
+#' # Define the model
+#' model <- pkmodel(numComp = 1,
+#'                  absorption = "Intravenous",
+#'                  ID = "Subject",
+#'                  Time = "Act_Time",
+#'                  CObs = "Conc",
+#'                  A1 = "Amount",
+#'                  data = pkData,
+#'                  modelName = "PkModel",
+#'                  workingDir = tempdir())
+#'
+#' # Fit model
+#' res <- fitmodel(model = model,
+#'                 hostPlatform = hostParams(sharedDirectory = tempdir()))
 #' model <- acceptAllEffects(model)
 #' }
 #' @return \code{NlmePmlModel} object

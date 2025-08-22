@@ -2,7 +2,7 @@
 % Please edit documentation in R/hostParams.R
 \name{hostParams}
 \alias{hostParams}
-\title{Initialize for NlmeParallelHost}
+\title{Create an NLME Parallel Host Configuration}
 \usage{
 hostParams(
   sharedDirectory,
@@ -21,52 +21,57 @@ hostParams(
 )
 }
 \arguments{
-\item{sharedDirectory}{Directory where temporary NLME run folder is created
-during execution. If missing, the current working directory will be used.}
+\item{sharedDirectory}{\code{character}. The directory where temporary run folders
+are created. Defaults to the current working directory.}
 
-\item{installationDirectory}{Directory containing NLME libraries/scripts}
+\item{installationDirectory}{\code{character}. The directory containing NLME
+libraries/scripts. Defaults to the \code{INSTALLDIR} environment variable.}
 
-\item{hostName}{Visual name of the host (default A name by which
-the machine is known on the network)}
+\item{hostName}{\code{character}. A display name for the host. Defaults to the
+system's network name (from \code{Sys.info()[["nodename"]]}).}
 
-\item{machineName}{IP address or name of the host(default
-127.0.0.1)}
+\item{machineName}{\code{character}. The IP address or network name of the host.
+Defaults to \code{"127.0.0.1"}.}
 
-\item{hostType}{\code{windows} or \code{linux}. Current OS by default.
-For remote runs it is possible to point
-the distro suppported, i.e. \code{RHEL8} or \code{UBUNTU2204}. In such case the
-corresponding \code{PML_BIN_DIR} variable will be created and NLME Engine libraries
-will be looked in \verb{installationDirectory/\{$PML_BIN_DIR\}}.}
+\item{hostType}{\code{character}. The host operating system. Defaults to the
+current OS (\code{Sys.info()[["sysname"]]}). While \code{"windows"} or \code{"linux"} are
+valid, for remote Linux hosts the following are officially supported:
+\code{"RHEL"} (for RHEL 8 and 9) and \code{"UBUNTU"} (for Ubuntu 22.04 and 24.04).
+Specifying one of these values correctly sets the \code{PML_BIN_DIR} variable.}
 
-\item{numCores}{Integer; Number of compute cores. 4 by default}
+\item{numCores}{\code{numeric}. The number of CPU cores to utilize. Defaults to
+\code{4}.}
 
-\item{parallelMethod}{String; Options are:
-\code{None}|\code{Multicore}|\code{LOCAL_MPI}|\code{SGE}|\code{SGE_MPI}|
-\code{TORQUE}|\code{TORQUE_MPI}|\code{LSF}|\code{LSF_MPI}|\code{SLURM_SLURM_MPI}.}
+\item{parallelMethod}{\code{character}. The parallel execution method. Options
+include: \code{"None"}, \code{"Multicore"}, \code{"LOCAL_MPI"}, \code{"SGE"}, \code{"SGE_MPI"},
+\code{"TORQUE"}, \code{"TORQUE_MPI"}, \code{"LSF"}, \code{"LSF_MPI"}, \code{"SLURM"}, \code{"SLURM_MPI"}.
+Defaults to \code{"LOCAL_MPI"}.}
 
-\item{userName}{String; How the user is identified to the remote
-system}
+\item{userName}{\code{character}. The username for remote host authentication.}
 
-\item{privateKeyFile}{Path to private key file, see
-\code{\link[ssh:ssh]{ssh::ssh_connect()}} for details}
+\item{privateKeyFile}{\code{character}. The path to an SSH private key file for
+remote authentication. See \code{ssh::ssh_connect()} for more details.}
 
-\item{userPassword}{Either a string or a callback function for
-password prompt, see \code{\link[ssh:ssh]{ssh::ssh_connect()}} for details}
+\item{userPassword}{\code{character} or \code{function}. The password or a callback
+function for remote authentication. See \code{ssh::ssh_connect()} for details.}
 
-\item{scriptPath}{a path to the script to be executed before
-starting Rscript within Certara.NLME8 package on the remote host. Ignored
-when running locally.}
+\item{scriptPath}{\code{character}. The path to a script to run on a remote host
+before the main job starts. Ignored for local runs.}
 
-\item{rLocation}{Path to Rscript executable on remote host;
-ignored on local host}
+\item{rLocation}{\code{character}. The path to the \code{Rscript} executable on a
+remote host. Ignored for local runs.}
 
-\item{isLocal}{Is this a local \code{TRUE} or remote \code{FALSE} host?}
+\item{isLocal}{\code{logical}. Set to \code{TRUE} for a local host or \code{FALSE} for a
+remote host. Defaults to \code{TRUE}.}
 }
 \value{
-NlmeParallelHost class instance
+An \code{NlmeParallelHost} object configured with the specified
+parameters.
 }
 \description{
-Initialize for NlmeParallelHost
+This helper function simplifies the creation and configuration of an
+\code{NlmeParallelHost} object, which defines the environment for running NLME
+jobs.
 }
 \examples{
 host <- hostParams(sharedDirectory = tempdir(),

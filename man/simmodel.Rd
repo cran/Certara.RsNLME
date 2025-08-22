@@ -72,10 +72,19 @@ model <- pkmodel(
   CObs = "Conc",
   Aa = "Amount",
   data = pkData,
-  modelName = "PkModel"
+  modelName = "PkModel",
+  workingDir = tempdir()
 )
-results <- simmodel(model, simParams)
+
+host <- hostParams(
+  sharedDirectory = tempdir(),
+  parallelMethod = "NONE",
+  hostName = "local",
+  numCores = 1
+ )
+
+results <- simmodel(model, simParams, hostPlatform = host)
 # with seed given additionally:
-results <- simmodel(model, simParams, seed = 3527)
+results <- simmodel(model, simParams, hostPlatform = host, seed = 3527)
 }
 }

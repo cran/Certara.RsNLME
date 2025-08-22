@@ -125,25 +125,7 @@
 
     MACs <- .get_MACAddresses()
 
-    if (.Platform$OS.type == "windows") {
-      os_type <- .Platform$OS.type
-    } else {
-      LSB <-
-        readLines(list.files(path = "/etc/", pattern = "*ease", full.names = TRUE)[1])
-      if (any(grepl("Ubuntu", LSB, ignore.case = TRUE))) {
-        os_type <- "Ubuntu"
-        if (any(grepl("22.04", LSB, fixed = TRUE))) {
-          os_type <- paste0(os_type, "2204")
-        }
-      } else if (any(grepl("Red Hat", LSB, ignore.case = TRUE))) {
-        os_type <- "RHEL"
-        if (any(grepl("8.", LSB, fixed = TRUE))) {
-          os_type <- paste0(os_type, "8")
-        }
-      } else {
-        os_type <- .Platform$OS.type
-      }
-    }
+    os_type <- .get_os_distribution
 
     Log <- list(
       eventType = "track",
@@ -263,3 +245,67 @@
   }
 }
 
+.get_os_distribution <- function() {
+  # Case 1: Handle Windows
+  if (.Platform$OS.type == "windows") {
+    return("windows")
+  }
+
+  # Case 2: Handle Linux and other Unix-like systems
+  # Prioritize the /etc/os-release file as it is the modern standard.
+  os_release_file <- "/etc/os-release"
+  if (file.exists(os_release_file)) {
+    tryCatch({
+      # Read the file and parse it into a named list
+      lines <- readLines(os_release_file)
+      # Filter out comments and empty lines
+      lines <- lines[trimws(lines) != "" & !startsWith(lines, "#")]
+      # Split on the first '=' to create key-value pairs
+      kv <- strsplit(lines, "=", fixed = TRUE)
+      # Create a named list, trimming quotes from values
+      os_info <- stats::setNames(
+        lapply(kv, function(p) gsub('"', '', p[2])),
+        lapply(kv, function(p) p[1])
+      )
+
+      # Extract ID and Version, converting to lower case for reliable matching
+      id <- tolower(os_info$ID)
+      version_id <- os_info$VERSION_ID
+
+      if (is.null(id) || is.null(version_id)) {
+        # If essential fields are missing, fall back
+        return(.Platform$OS.type)
+      }
+
+      # --- Distribution-specific logic ---
+
+      # Handle RHEL, CentOS, and similar enterprise distros
+      if (id %in% c("rhel", "centos")) {
+        # Extract major version number (e.g., "8" from "8.6")
+        major_version <- sub("\\..*", "", version_id)
+        # Return in format like "RHEL8" or "CentOS9"
+        return(paste0(toupper(id), major_version))
+      }
+
+      # Handle Ubuntu
+      if (id == "ubuntu") {
+        # Remove the dot from the version (e.g., "22.04" -> "2204")
+        version_no_dot <- gsub("\\.", "", version_id, fixed = TRUE)
+        # Return in format like "Ubuntu2204"
+        return(paste0("Ubuntu", version_no_dot))
+      }
+
+      # If the distribution is not in our specific list, fall back.
+      # We could also return os_info$PRETTY_NAME here if we wanted a
+      # more descriptive, but less standardized, name.
+      return(.Platform$OS.type)
+
+    }, error = function(e) {
+      # In case of any parsing error, fall back to the generic type
+      return(.Platform$OS.type)
+    })
+  }
+
+  # Fallback: If /etc/os-release doesn't exist or failed, return generic OS type
+  return(.Platform$OS.type)
+}

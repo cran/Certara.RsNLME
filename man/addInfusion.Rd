@@ -31,7 +31,18 @@ Allows user to switch any dosing compartment to infusion
 }
 \examples{
 \donttest{
-newModel <- addInfusion(model, "A1", FALSE, FALSE, "A1_1")
+ pkData1 <- pkData
+ pkData1$A1_1 <- 0
+ model <- pkmodel(numComp = 2,
+ absorption = "Intravenous",
+ ID = "Subject",
+ Time = "Act_Time",
+ CObs = "Conc",
+ A1 = "Amount",
+ data = pkData1,
+ modelName = "PkModel",
+ workingDir = tempdir())
+ newModel <- addInfusion(model, "A1", FALSE, FALSE, "A1_1")
 }
 
 }

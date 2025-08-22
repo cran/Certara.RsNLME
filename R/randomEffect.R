@@ -22,11 +22,13 @@
 #'   Time = "Act_Time",
 #'   A1 = "Amount",
 #'   CObs = "Conc",
-#'   modelName = "TwCpt_IVBolus_FOCE_ELS"
+#'   modelName = "TwCpt_IVBolus_FOCE_ELS",
+#'   workingDir = tempdir()
 #'   )
 #'
-#' model <- model |>
-#'   randomEffect(effect = c("nV", "nCl", "nCl2"), value = rep(0.1, 3))
+#' model <-
+#'   randomEffect(model,
+#'                effect = c("nV", "nCl", "nCl2"), value = rep(0.1, 3))
 #' @export
 #'
 randomEffect <-
@@ -188,10 +190,10 @@ randomEffect <-
 
 
     if (!is.null(value)) {
-      if (any(value < 0)) {
-        stop("supplied `values` must be positive")
-      }
       if (isDiagonal) {
+        if (any(value < 0)) {
+          stop("supplied `values` must be positive")
+        }
         assertthat::assert_that(length(value) == length(effect),
                                 msg = "incorrect number of `values` specified for corresponding `effects` in diagonal matrix")
         randomMatrixDF <-

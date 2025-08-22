@@ -44,9 +44,11 @@ model <- pkmodel(
   Time = "Act_Time",
   A1 = "Amount",
   CObs = "Conc",
-  modelName = "TwCpt_IVBolus_FOCE_ELS"
+  modelName = "TwCpt_IVBolus_FOCE_ELS",
+  workingDir = tempdir()
   )
 
-model <- model |>
-  randomEffect(effect = c("nV", "nCl", "nCl2"), value = rep(0.1, 3))
+model <-
+  randomEffect(model,
+               effect = c("nV", "nCl", "nCl2"), value = rep(0.1, 3))
 }

@@ -19,14 +19,16 @@
 #'   Time = "Act_Time",
 #'   A1 = "Amount",
 #'   CObs = "Conc",
-#'   modelName = "TwCpt_IVBolus_FOCE_ELS"
+#'   modelName = "TwCpt_IVBolus_FOCE_ELS",
+#'   workingDir = tempdir()
 #'   )
 #'
 #'  # View initial/current fixed effect values
 #'  initFixedEffects(model)
 #'
-#' model <- model |>
+#' model <-
 #' fixedEffect(
+#'   model,
 #'   effect = c("tvV", "tvCl", "tvV2", "tvCl2"),
 #'   value = c(15, 5, 40, 15)
 #'   )

@@ -16,7 +16,8 @@ Characters vector of random effect names
 Use to return character vector of random effect names (if available) in model object
 }
 \examples{
-model <- pkmodel(columnMap = FALSE)
+model <- pkmodel(columnMap = FALSE,
+                 workingDir = tempdir())
 getRandomEffectNames(model)
 
 }

@@ -17,6 +17,8 @@ Return a vector of model variable names from model object
 }
 \examples{
 \donttest{
+model <- pkmodel(columnMap = FALSE,
+                 workingDir = tempdir())
 modelVariableNames(model)
 }
 

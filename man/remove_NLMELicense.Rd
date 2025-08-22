@@ -29,11 +29,10 @@ tool to log out the user, and attempts to remove the NLME license.
 }
 \examples{
 \donttest{
-  result <- remove_NLMELicense("/path/to/install/dir")
-  if (result) {
-    message("License removed successfully!")
-  } else {
-    message("Failed to remove license.")
-  }
+INSTALLDIR <- Sys.getenv("INSTALLDIR")
+if (INSTALLDIR == "") INSTALLDIR <- "C:/Program Files/Certara/NLME_Engine"
+if (FALSE) { # to prevent unintended logout
+  result <- remove_NLMELicense(INSTALLDIR)
+}
 }
 }

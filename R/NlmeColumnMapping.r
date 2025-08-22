@@ -266,7 +266,8 @@ writeInputData <- function(model, datafileName, workingDir) {
 #' @param data   Input data of class \code{data.frame}.
 #'
 #' @examples
-#' model <- pkmodel(columnMap = FALSE)
+#' model <- pkmodel(columnMap = FALSE,
+#'                  workingDir = tempdir())
 #'
 #' model <- dataMapping(model, pkData)
 #'

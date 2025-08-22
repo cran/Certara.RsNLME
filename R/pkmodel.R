@@ -38,7 +38,8 @@
 #'   ID = "Subject",
 #'   Time = "Act_Time",
 #'   A1 = "Amount",
-#'   CObs = "Conc"
+#'   CObs = "Conc",
+#'   workingDir = tempdir()
 #' )
 #'
 #' # View the model as well as its associated column mappings

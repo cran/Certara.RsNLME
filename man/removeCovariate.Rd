@@ -9,9 +9,12 @@ removeCovariate(.Object, covariate = NULL, paramName = NULL)
 \arguments{
 \item{.Object}{Model object}
 
-\item{covariate}{Covariates to remove from model. If \code{NULL} all covariates will be removed from model.}
+\item{covariate}{Covariates to remove from model. If \code{NULL} all
+covariates will be removed from model.}
 
-\item{paramName}{Structural parameters for which to remove covariate effect(s) from. If \code{NULL} covariate effect will be removed from all structural parameters.}
+\item{paramName}{Structural parameters for which to remove covariate
+effect(s) from. If \code{NULL} covariate effect will be removed from all
+structural parameters.}
 }
 \value{
 Modified \code{NlmePmlModel} object
@@ -26,7 +29,8 @@ model <- pkmodel(
   ID = "Subject",
   Time = "Act_Time",
   A1 = "Amount",
-  CObs = "Conc"
+  CObs = "Conc",
+  workingDir = tempdir()
 )
 
 # Add Gender covariate of type categorical

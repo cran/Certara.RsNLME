@@ -18,7 +18,9 @@
 Prints model information, including PML and column mappings.
 }
 \examples{
-model <- pkmodel(columnMap = FALSE, data = pkData)
+model <- pkmodel(columnMap = FALSE,
+                 data = pkData,
+                 workingDir = tempdir())
 print(model)
 
 }

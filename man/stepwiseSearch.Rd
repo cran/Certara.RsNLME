@@ -51,18 +51,19 @@ Executes an NLME stepwise covariate search
 \examples{
 \donttest{
 # Define the model
-model <- pkmodel(numCompartments = 2,
+model <- pkmodel(numCompartments = 1,
                  data = pkData,
                  ID = "Subject",
                  Time = "Act_Time",
                  A1 = "Amount",
-                 CObs = "Conc")
+                 CObs = "Conc",
+                 workingDir = tempdir())
 
 # Add Gender covariate of type categorical
 model <- addCovariate(model,
                       covariate = "Gender",
                       type = "Categorical",
-                      effect = c("V2", "Cl2"),
+                      effect = c("V", "Cl"),
                       levels = c(0, 1),
                       labels = c("Female", "Male"))
 
@@ -75,12 +76,13 @@ model <- addCovariate(model,
              effect = c("V", "Cl"))
 
 # Define the host
-defaultHost <- hostParams(parallelMethod = "None",
+defaultHost <- hostParams(parallelMethod = "MULTICORE",
                    hostName = "local",
-                   numCores = 1)
+                   numCores = 8,
+                   sharedDirectory = tempdir())
 
 # Define the engine parameters
-params <- engineParams(model)
+params <- engineParams(model, numIterations = 6)
 
 # Define covariate model
 cp <- covariateModel(model)

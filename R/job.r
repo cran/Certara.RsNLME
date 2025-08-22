@@ -41,18 +41,56 @@ downloadFileWithCat <- function(job, filename) {
 #'
 #' @examples
 #' \donttest{
-#'   param <- NlmeEngineExtraParams(
-#'     method = 3,
-#'     numIterations = 1000
+#'   model <- pkmodel(
+#'     parameterization = "Clearance",
+#'     numCompartments = 2,
+#'     data = pkData,
+#'     ID = "Subject",
+#'     Time = "Act_Time",
+#'     A1 = "Amount",
+#'     CObs = "Conc",
+#'     workingDir = tempdir()
 #'   )
 #'
-#'   profile1 <- ProfileVar("tvV", 9.548, "-2,-1,0,1,2")
-#'   profile2 <- ProfileVar("tvCl", 0.919, "-0.5,0,1.5")
-#'   profiles <- ProfileParameters("USE_DELTA", c(profile1, profile2))
+#'   params <- NlmeEngineExtraParams(
+#'     method = 3,
+#'     numIterations = 1
+#'   )
 #'
-#'   job <- profilePertubate(defaultHost, params, profiles, model)
+#'   host <- hostParams(
+#'     sharedDirectory = tempdir(),
+#'     parallelMethod = "LOCAL_MPI",
+#'     hostName = "local_mpi",
+#'     numCores = 4
+#'   )
+#'
+#'   profile1 <- ProfileVar(
+#'     "tvV",
+#'     9.548,
+#'     "-2,0"
+#'   )
+#'
+#'   profile2 <- ProfileVar(
+#'     "tvCl",
+#'     0.919,
+#'     "-0.5,0"
+#'   )
+#'
+#'   profiles <- ProfileParameters(
+#'     "USE_DELTA",
+#'     c(profile1, profile2)
+#'   )
+#'
+#'   job <- profilePertubate(
+#'     hostPlatform = host,
+#'     params = params,
+#'     profiles = profiles,
+#'     model = model
+#'   )
+#'
 #'   status <- NlmeJobStatus(job)
 #' }
+#'
 #' @export
 #' @return Character. Job status messages.
 #' @keywords internal

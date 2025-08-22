@@ -30,7 +30,8 @@
 #'           ID = "Subject",
 #'           Time = "Act_Time",
 #'           A1 = "Amount",
-#'           CObs = "Conc")
+#'           CObs = "Conc",
+#'           workingDir = tempdir())
 #'
 #' model <-
 #'   addCovariate(model,
@@ -43,7 +44,8 @@
 #' multicoreHost <-
 #'    hostParams(parallelMethod = "Multicore",
 #'               hostName = "multicore",
-#'               numCores = 4)
+#'               numCores = 4,
+#'               sharedDirectory = tempdir())
 #'
 #' # specify scenarios
 #' CovariateEffectNames <- listCovariateEffectNames(model)
@@ -71,7 +73,7 @@
 #' res <-
 #'   sortfit(model,
 #'           hostPlatform = multicoreHost,
-#'           params = engineParams(model),
+#'           params = engineParams(model, numIterations = 5, fastOptimization = TRUE),
 #'           sortColumns = SortColumns("Gender"),
 #'           scenarios = scenarios)
 #'

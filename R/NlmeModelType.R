@@ -33,6 +33,7 @@ ModelTypeNames <- c(
 #' \donttest{
 #' NlmeModelType(PK)
 #' }
+#' @noRd
 #' @keywords internal
 setClass(
   "NlmeModelType",

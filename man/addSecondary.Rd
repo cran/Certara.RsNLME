@@ -37,10 +37,13 @@ it adds the new secondary parameter to the object and updates the PML model.
 }}
 \examples{
 \donttest{
-model <- addSecondary(model, "Spc_Param", "log(2)/tvKe")
+model <- pkmodel(columnMap = FALSE,
+                 absorption = "FirstOrder",
+                 workingDir = tempdir())
+model <- addSecondary(model, "Ke", "tvCl/tvV")
 model <- addSecondary(
   model, "Tmax",
-  "CalcTMax(tvA,tvAlpha,tvB,tvBeta,C,Gamma)"
+  "CalcTMax(tvA,tvCl/tvV)"
 )
 }
 

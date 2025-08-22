@@ -13,11 +13,27 @@ acceptAllEffects(model)
 \code{NlmePmlModel} object
 }
 \description{
-Updates PML statements in model object with estimates returned from model execution. Use \code{\link{copyModel}} and set
-argument \code{acceptAllEffects = TRUE} to create new model object with final estimates from base model run.
+Updates PML statements in model object with estimates returned from model
+execution. Use \code{\link{copyModel}} and set argument
+\code{acceptAllEffects = TRUE} to create new model object with final
+estimates from base model run.
 }
 \examples{
 \donttest{
+# Define the model
+model <- pkmodel(numComp = 1,
+                 absorption = "Intravenous",
+                 ID = "Subject",
+                 Time = "Act_Time",
+                 CObs = "Conc",
+                 A1 = "Amount",
+                 data = pkData,
+                 modelName = "PkModel",
+                 workingDir = tempdir())
+
+# Fit model
+res <- fitmodel(model = model,
+                hostPlatform = hostParams(sharedDirectory = tempdir()))
 model <- acceptAllEffects(model)
 }
 }

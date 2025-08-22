@@ -26,7 +26,17 @@ the corresponding input data column of a categorical/occasion covariate is of cl
 }
 \examples{
 \donttest{
-model <- addLabel(model, covariate, c(1, 2, 3), c("a", "b", "c"))
+model <- pkmodel(columnMap = FALSE,
+                 isPopulation = FALSE,
+                 workingDir = tempdir())
+
+model <- suppressWarnings(addCovariate(model,
+                      covariate = "Gender",
+                      type = "Categorical",
+                      effect = c("V"),
+                      levels = c(0, 1)))
+model@isTextual <- TRUE
+model <- addLabel(model, "Gender", c(1, 2), c("male", "female"))
 }
 
 }

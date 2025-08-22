@@ -42,17 +42,52 @@ getProfilesString <- function(profiles) {
 #'
 #' @examples
 #' \donttest{
-#' # metod = 3 is FOCE-LB
-#'  params <- NlmeEngineExtraParams(
-#'    method = 3,
-#'    numIterations = 1000
-#'  )
+#'   model <- pkmodel(
+#'     parameterization = "Clearance",
+#'     numCompartments = 2,
+#'     data = pkData,
+#'     ID = "Subject",
+#'     Time = "Act_Time",
+#'     A1 = "Amount",
+#'     CObs = "Conc",
+#'     workingDir = tempdir()
+#'   )
 #'
-#'  profile1 <- ProfileVar("tvV", 9.548, "-2,-1,0,1,2")
-#'  profile2 <- ProfileVar("tvCl", 0.919, "-0.5,0,1.5")
-#'  profiles <- ProfileParameters("USE_DELTA", c(profile1, profile2))
+#'   params <- NlmeEngineExtraParams(
+#'     method = 3,
+#'     numIterations = 1
+#'   )
 #'
-#'  job <- profilePertubate(defaultHost, params, profiles, model)
+#'   host <- hostParams(
+#'     sharedDirectory = tempdir(),
+#'     parallelMethod = "MULTICORE",
+#'     hostName = "local",
+#'     numCores = 4
+#'   )
+#'
+#'   profile1 <- ProfileVar(
+#'     "tvV",
+#'     9.548,
+#'     "-2,2"
+#'   )
+#'
+#'   profile2 <- ProfileVar(
+#'     "tvCl",
+#'     0.919,
+#'     "-0.5,1.5"
+#'   )
+#'
+#'   profiles <- ProfileParameters(
+#'     "USE_DELTA",
+#'     c(profile1, profile2)
+#'   )
+#'
+#'   job <- profilePertubate(
+#'     hostPlatform = host,
+#'     params = params,
+#'     profiles = profiles,
+#'     model = model
+#'   )
 #' }
 #' @keywords internal
 #' @return List of results from NLME execution.
@@ -101,21 +136,52 @@ profilePertubate <- function(hostPlatform,
 #'
 #' @examples
 #' \donttest{
-#'   dataset <- NlmeDataset()
+#'   model <- pkmodel(
+#'     parameterization = "Clearance",
+#'     numCompartments = 2,
+#'     data = pkData,
+#'     ID = "Subject",
+#'     Time = "Act_Time",
+#'     A1 = "Amount",
+#'     CObs = "Conc",
+#'     workingDir = tempdir()
+#'   )
 #'
 #'   params <- NlmeEngineExtraParams(
 #'     method = 3,
-#'     num_iterations = 1000
+#'     numIterations = 1
 #'   )
-#'   host <- hostParams(parallelMethod = "None",
-#'                     hostName = "local",
-#'                     numCores = 1)
-#'   sortColumns <- SortColumns("")
-#'   profile1 <- ProfileVar("tvV", 9.548, "-2,-1,0,1,2")
-#'   profile2 <- ProfileVar("tvCl", 0.919, "-0.5,0,1.5")
-#'   profiles <- ProfileParameters("USE_DELTA", c(profile1, profile2))
-#'   # dataFile, colDefFile, modelFile are assumed to be written to the working directory
-#'   job <- RunProfilePertubation(host, dataset, params, profiles, sortColumns, scenarios)
+#'
+#'   host <- hostParams(
+#'     sharedDirectory = tempdir(),
+#'     parallelMethod = "None",
+#'     hostName = "Local",
+#'     numCores = 4
+#'   )
+#'
+#'   profile1 <- ProfileVar(
+#'     "tvV",
+#'     9.548,
+#'     "-2,0,2"
+#'   )
+#'
+#'   profile2 <- ProfileVar(
+#'     "tvCl",
+#'     0.919,
+#'     "-0.5,0,1.5"
+#'   )
+#'
+#'   profiles <- ProfileParameters(
+#'     "USE_DELTA",
+#'     c(profile1, profile2)
+#'   )
+#'
+#'   job <- profilePertubate(
+#'     hostPlatform = host,
+#'     params = params,
+#'     profiles = profiles,
+#'     model = model
+#'   )
 #' }
 #' @export RunProfilePertubation
 #' @keywords internal

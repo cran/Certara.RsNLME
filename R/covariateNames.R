@@ -5,7 +5,8 @@
 #' @param model Model object
 #'
 #' @examples
-#' model <- pkmodel(columnMap = FALSE)
+#' model <- pkmodel(columnMap = FALSE,
+#'                  workingDir = tempdir())
 #' model <- addCovariate(model, covariate = "BW", effect = "V")
 #' model <- addCovariate(model, covariate = "Age", effect = "Cl")
 #'

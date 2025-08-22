@@ -364,14 +364,17 @@ GenerateParamsfile <-
           }
         }
 
+        if (is.null(params)) {
+          warning("NLME engine parameters are not passed to GenerateParamsfile function. Using the deafult.")
+          params <- NlmeEngineExtraParams()
+        }
         # /o due to counting the number of models in NLME8
         cat(
           sprintf(
-            "-m %d -n %d /o %d %s",
+            "-m %d -n %d /o %d",
             params@method,
             params@numIterations,
-            params@odeToUse,
-            params@scenarios
+            params@odeToUse
           ),
           file = argsFilename,
           sep = "\n",
@@ -394,11 +397,10 @@ GenerateParamsfile <-
 
         cat(
           sprintf(
-            "-xnp %d -anagrad %d -logtran %d -xrestart %d -xnorderagq %d -xfocehess %d  -xstderr %d -rtol %f -atol %f ",
+            "-xnp %d -anagrad %d -logtran %d -xnorderagq %d -xfocehess %d  -xstderr %d -rtol %f -atol %f ",
             params@xnp,
             params@anagrad,
             params@logtran,
-            params@xrestart,
             params@xnorderagq,
             params@xfocehess,
             params@xstderr,
@@ -424,13 +426,6 @@ GenerateParamsfile <-
         }
 
         cat(
-          sprintf(" -xlameth %d  ", params@xlameth),
-          file = argsFilename,
-          sep = "\n",
-          append = TRUE
-        )
-
-        cat(
           sprintf(" -xlandig %d ", params@xlandig),
           file = argsFilename,
           sep = "\n",
@@ -439,13 +434,6 @@ GenerateParamsfile <-
 
         cat(
           sprintf(" -xlatol %f ", params@xlatol),
-          file = argsFilename,
-          sep = "\n",
-          append = TRUE
-        )
-
-        cat(
-          sprintf(" -xblmeth %d ", params@xblmeth),
           file = argsFilename,
           sep = "\n",
           append = TRUE
@@ -464,6 +452,52 @@ GenerateParamsfile <-
           sep = "\n",
           append = TRUE
         )
+
+        # FOCE ELS convergence
+        if (params@method == 5) { # "FOCE-ELS", "LAPLACIAN"
+          # Get default values from the class prototype
+          proto_obj <-
+            methods::getClass("NlmeEngineExtraParams")@prototype
+          proto <-
+            sapply(slotNames(params), function(name)
+              slot(proto_obj, name), simplify = FALSE)
+
+          if (!isTRUE(all.equal(params@gradTolOuter, proto$gradTolOuter)))
+            cat(
+              sprintf(" -gradTolOuter %g ", params@gradTolOuter),
+              file = argsFilename,
+              sep = "\n",
+              append = TRUE
+            )
+          if (!isTRUE(all.equal(params@stepTolOuter, proto$stepTolOuter)))
+            cat(
+              sprintf(" -stepTolOuter %g ", params@stepTolOuter),
+              file = argsFilename,
+              sep = "\n",
+              append = TRUE
+            )
+          if (!isTRUE(all.equal(params@gradTolInner, proto$gradTolInner)))
+            cat(
+              sprintf(" -gradTolInner %g ", params@gradTolInner),
+              file = argsFilename,
+              sep = "\n",
+              append = TRUE
+            )
+          if (!isTRUE(all.equal(params@stepTolInner, proto$stepTolInner)))
+            cat(
+              sprintf(" -stepTolInner %g ", params@stepTolInner),
+              file = argsFilename,
+              sep = "\n",
+              append = TRUE
+            )
+          if (!isTRUE(all.equal(params@refDeltaLagl, proto$refDeltaLagl)))
+            cat(
+              sprintf(" -refDeltaLagl %g ", params@refDeltaLagl),
+              file = argsFilename,
+              sep = "\n",
+              append = TRUE
+            )
+        }
 
         if (params@method != 6) {
           cat(
@@ -484,28 +518,35 @@ GenerateParamsfile <-
           )
         }
 
-        if (params@isQRPEMStyleMethod == 1) {
-          cat(
-            sprintf(
-              "-xisample %d -xmapassist %d -ximpsampdof %d -xmcpem %d -xpemrunall %d -xsirsamp %d -xburnin %d -xnonomegaburn %d -xstartfromsavedposteriors %d -xaccratio %f -xscramble %d",
-              params@xisample,
-              params@xmapassist,
-              params@ximpsampdof,
-              params@xmcpem,
-              params@xpemrunall,
-              params@xsirsamp,
-              params@xburnin,
-              params@xnonomegaburn,
-              params@xstartfromsavedposteriors,
-              params@xaccratio,
-              params@xscramble
-            ),
-            file = argsFilename,
-            sep = "\n",
-            append = TRUE
-          )
-        }
+        if (params@method == 1) {
+          # QRPEM command-line arguments generation
 
+          args_list <- c(
+            sprintf("-xisample %d", params@xisample),
+            sprintf("-xmapassist %d", params@xmapassist),
+            sprintf("-ximpsampdof %d", params@ximpsampdof),
+            sprintf("-xmcpem %d", params@xmcpem),
+            sprintf("-xpemrunall %d", params@xpemrunall),
+            sprintf("-xsirsamp %d", params@xsirsamp),
+            sprintf("-xburnin %d", params@xburnin),
+            sprintf("-xnonomegaburn %d", params@xnonomegaburn),
+            sprintf("-xaccratio %f", params@xaccratio),
+            sprintf("-xscramble %d", params@xscramble)
+          )
+
+          # Only include emTolType emConvLen and emConvCritVal if emTolType is nonzero
+          if (params@emTolType != 0) {
+            args_list <- c(
+              args_list,
+              sprintf("-emTolType %d", params@emTolType),
+              sprintf("-emConvLen %d", params@emConvLen),
+              sprintf("-emConvCritVal %d", params@emConvCritVal)
+            )
+          }
+
+          # Write the complete command line to the file
+          cat(paste(args_list, collapse = " "), file = argsFilename, sep = "\n", append = TRUE)
+        }
 
         cat(
           sprintf(

@@ -2,20 +2,21 @@
 % Please edit documentation in R/NlmeParallelHost.R
 \name{print.NlmeParallelHost}
 \alias{print.NlmeParallelHost}
-\title{Print method for NlmeParallelHost class}
+\title{Print an NlmeParallelHost Object}
 \usage{
 \method{print}{NlmeParallelHost}(x, ...)
 }
 \arguments{
-\item{x}{An NlmeParallelHost object.}
+\item{x}{An \code{NlmeParallelHost} object to print.}
 
-\item{...}{Additional arguments passed to the print function.}
+\item{...}{Additional arguments passed to the \code{print} function.}
 }
 \value{
-\code{NULL}
+\code{NULL}. This function is called for its side effect of printing
+to the console.
 }
 \description{
-This method prints the information of an NlmeParallelHost object.
+Prints a summary of the configuration of an \code{NlmeParallelHost} object.
 }
 \examples{
 host <- NlmeParallelHost(
@@ -23,12 +24,13 @@ host <- NlmeParallelHost(
   installationDirectory = "~/nlme/",
   hostName = "my_host",
   machineName = "192.168.1.100",
-  hostType = "RHEL8",
+  hostType = "RHEL",
   numCores = 8,
   isLocal = FALSE,
   rLocation = "/usr/bin/R",
   scriptPath = "/path/to/script.R",
-  userAuthentication = NlmeUserAuthentication(userName = "myuser", userPassword = "mypassword"),
+  userAuthentication =
+    NlmeUserAuthentication(userName = "myuser", userPassword = "mypassword"),
   parallelMethod = NlmeParallelMethod("SGE_MPI")
 )
 

@@ -21,8 +21,18 @@ Create NlmeParallelHost object from json file with host definition
 \examples{
 \donttest{
 # path nlme_hostPath should be specified
+ nlme_hostPath <- tempfile()
+ host1 <- paste0('{"profile_name":"Multicore",',
+  '"hostname":"127.0.0.1",',
+  '"cores_number":4,',
+  '"parallel_mode":"MULTICORE"}')
+ host2 <- paste0('{"profile_name":"MPI",',
+ '"hostname":"127.0.0.1",',
+ '"cores_number":8,',
+ '"parallel_mode":"LOCAL_MPI"}')
 
-host <- parse_NLMEHosts(nlme_hostPath)
+writeLines(paste0("[", host1, ",", host2, "]"), nlme_hostPath)
+hosts <- parse_NLMEHosts(nlme_hostPath)
 }
 }
 \keyword{internal}

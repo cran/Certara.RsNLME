@@ -18,9 +18,13 @@ containing the edited PML statements.
 }
 \examples{
 \donttest{
-model <- pkmodel(columnMap = FALSE)
+model <- pkmodel(columnMap = FALSE,
+                 workingDir = tempdir())
 
-newModel <- editModel(model)
+if (FALSE) {
+  # will open an additional window with the model text:
+  newModel <- editModel(model)
+}
 }
 
 }

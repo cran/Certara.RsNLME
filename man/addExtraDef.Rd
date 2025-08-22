@@ -19,7 +19,10 @@ Adds user defined extra column/table definitions to column definition file
 }
 \examples{
 \donttest{
-model <- addExtraDef(model, c("addlcol(ADDL)", "table(file=\"res.csv\",time(0),Ka,V,Cl,Tlg)"))
+model <- pkmodel(columnMap = FALSE,
+                 workingDir = tempdir())
+model <- addExtraDef(model, c("addlcol(ADDL)",
+                              "table(file=\"res.csv\",time(0),Ka,V,Cl,Tlg)"))
 }
 
 }

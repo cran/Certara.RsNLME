@@ -3,90 +3,240 @@
 \docType{class}
 \name{NlmeEngineExtraParams-class}
 \alias{NlmeEngineExtraParams-class}
-\alias{NlmeEngineExtraParams}
-\title{NlmeEngineExtraParams : Defines all extra engine parameters}
+\title{NlmeEngineExtraParams : Defines all engine parameters for NLME models
+Wrapped up by \code{engineParams} function.}
 \description{
-NlmeEngineExtraParams : Defines all extra engine parameters
+NlmeEngineExtraParams : Defines all engine parameters for NLME models
+Wrapped up by \code{engineParams} function.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{isPopulation}}{is this a population model}
+\item{\code{isPopulation}}{logical; TRUE if the model is a population model, FALSE
+for an individual model.}
 
-\item{\code{method}}{what engine to use
-QRPEM = 1|IT2S-EM = 2|FOCE-LB = 3|FO = 4|
-       LAPLACIAN = 5|NAIVE-POOLED = 6
-The only difference between FOCE-ELS and Laplacian is the setup for the other parameter "PARAMS_FOCEHESE".
-If FOCE-ELS is chosen, PARAMS_FOCEHESE = 1. If Laplacian is chosen, PARAMS_FOCEHESE = 0. PARAMS_FOCEHESE arg
-should not be provided, and is controlled by the method.}
+\item{\code{sort}}{character; String to pass sorting options to the NLME engine.
+Typically " -sort " to enable sorting or "" to disable it.}
 
-\item{\code{numIterations}}{maximum number of iterations}
+\item{\code{csv}}{character; String to control CSV input options. Typically " -csv "
+to strict the input data to comma-separated-values. Use "" to disable it
+(NLME will try to guess the input format).}
 
-\item{\code{odeToUse}}{What ODE to use
-common : ODE_STIFF=2|ODE_NON_STIFF=3|ODE_AUTO_DETECT=5|MATRIX_EXP=6
-others : ODE_LSODE=1|ODE_LSODE_ANA_JAC=2|ODE_RK=3|ODE_LSODA=4|
-         ODE_LSODA_ANA_JAC=5|MATRIX_EXP=6}
+\item{\code{method}}{numeric; Integer code specifying the estimation method.
+\itemize{
+  \item 1: QRPEM
+  \item 2: IT2S-EM
+  \item 3: FOCE-LB
+  \item 4: FO
+  \item 5: FOCE-ELS/LAPLACIAN (see below for choice between FOCE-ELS and LAPLACIAN)
+  \item 6: NAIVE-POOLED
+}
+  The choice between FOCE-ELS and LAPLACIAN (when \code{method} is 5) depends
+  on the \code{xfocehess} slot: \code{xfocehess = 1} selects FOCE-ELS, and
+  \code{xfocehess = 0} selects LAPLACIAN.}
 
-\item{\code{anagrad}}{n  0, or 1 to allow analytic gradients (default 0)}
+\item{\code{numIterations}}{numeric; The maximum number of iterations allowed for the
+estimation algorithm.  Values must be non-negative integers.}
 
-\item{\code{xnp}}{n  number of nonparametric generations (or 0)}
+\item{\code{odeToUse}}{numeric; Integer code specifying the ODE solver to be used.
+  Possible values are:
+\itemize{
+  \item 1: LSODE with numerical Jacobian
+  \item 2: LSODE with analytical Jacobian
+  \item 3: Runge-Kutta
+  \item 4: LSODA with numerical Jacobian
+  \item 5: LSODA with analytical Jacobian
+  \item 6: Matrix Exponent
+  \item 7: DOPRI5
+}}
 
-\item{\code{xrestart}}{n     0, or 1 to restart}
+\item{\code{rtol}}{numeric; Specifies the relative tolerance for the ODE solver.}
 
-\item{\code{xnorderagq}}{n   number of AGQ points per axis (or 0)}
+\item{\code{atol}}{numeric; Specifies the absolute tolerance for the ODE solver.}
 
-\item{\code{xfocehess}}{n    0 for numerical hessian, 1 for foce}
+\item{\code{nmxstep}}{numeric; Specifies the maximum number of steps allowed for the
+ODE solver.}
 
-\item{\code{xstderr}}{n    0=none, 1=central, 2=forward}
+\item{\code{anagrad}}{numeric; Flag controlling the differentiation method used
+during the optimization of random effects (etas). 0 uses a finite
+difference approach, and 1 uses automatic differentiation where possible.}
 
-\item{\code{xlameth}}{n    LAGL Method 1, 2, or 3}
+\item{\code{xnp}}{numeric; Controls the use of non-parametric (NP) optimization.
+\itemize{
+  \item 0: No NP optimization.
+  \item 1: NONMEM-style NP optimization using posthoc estimates as support points.
+  \item >1: Evolutionary NP algorithm with \code{xnp} generations.
+}}
 
-\item{\code{xlandig}}{n      LAGL nDigit}
+\item{\code{xnorderagq}}{numeric; Specifies the number of quadrature points per
+  dimension for Adaptive Gaussian Quadrature (AGQ). Only applicable when
+  \code{method} is \code{FOCE-ELS} or \code{LAPLACIAN}.
+\itemize{
+  \item 1: Standard FOCE-ELS/LAPLACIAN computation (no AGQ).
+  \item >1: AGQ is performed. The total number of quadrature points used is \code{(number of ETAs)^xnorderagq}.
+}}
 
-\item{\code{xlatol}}{n       LAGL tolerance}
+\item{\code{xfocehess}}{numeric; Determines the method for calculating the Hessian
+  matrix when using FOCE methods.
+\itemize{
+  \item 0: Use numerical second derivatives.
+  \item 1: Use the FOCE approximation.
+}
+  Applicable only when \code{method} is \code{FOCE-ELS} or \code{LAPLACIAN}.}
 
-\item{\code{xblndig}}{n      BLUP Method 1, 2, or 3}
+\item{\code{xstderr}}{numeric; Specifies the method for standard error estimation.
+\itemize{
+  \item 0: No standard error estimation.
+  \item 1: Central difference method.
+  \item 2: Forward difference method.
+}}
 
-\item{\code{xblndig}}{n      BLUP nDigit}
+\item{\code{sand}}{character; String to request sandwich standard error calculation.
+Typically " -sand " or "".}
 
-\item{\code{xbltol}}{n       BLUP tolerance}
+\item{\code{fisher}}{character; String to request Fisher score standard error
+calculation. Typically " -fscore " or "".}
 
-\item{\code{xpcwresnrep}}{n  number of reps for PCWRES simulation}
+\item{\code{autodetect}}{character; String to request auto-detection of standard
+error method. Typically " -AutoSE " or "".}
 
-\item{\code{xisample}}{n     number of samples for QRPEM}
+\item{\code{xlandig}}{numeric; Specifies the optimization accuracy (NDIGIT) for the
+outer loop (thetas and sigmas) when using \code{FOCE-ELS} or
+\code{LAPLACIAN} methods.}
 
-\item{\code{xmapassist}}{n   0 (default) or >0, to enable map assist and specify periodicity}
+\item{\code{xlatol}}{numeric; Specifies the relative step size used for numerical
+computation of the Hessian matrix (second derivatives) during standard
+error calculation.}
 
-\item{\code{xmapnp}}{n       map naive-pool control}
+\item{\code{xblndig}}{numeric; Specifies the optimization accuracy (NDIGIT) for the
+inner loop (optimization of etas).  Also applies to the single optimization
+loop in the \code{NAIVE-POOLED} method.}
 
-\item{\code{ximpsampdof}}{n  importance sampling control (-3 to 30)
-NORMAL=0
-DBL_EXP=1
-DIRECT=2
-MIXTURE_2=-2
-MIXTURE_3=-3}
+\item{\code{xbltol}}{numeric; Specifies the relative step size for numerical
+differentiation during model linearization.}
 
-\item{\code{xmcpem}}{n       0 for QRPEM, 1 for MCPEM}
+\item{\code{gradTolOuter}}{Numeric maximum gradient tolerance in the outer
+(Theta/Omega/Sigma) optimization loop. Applicable to \code{FOCE-ELS} and
+\code{LAPLACIAN} methods.}
 
-\item{\code{xsirsamp}}{n     number of SIR samples}
+\item{\code{stepTolOuter}}{Numeric maximum step tolerance in the outer
+(Theta/Omega/Sigma) optimization loop. Applicable to \code{FOCE-ELS} and
+\code{LAPLACIAN} methods.}
 
-\item{\code{xburnin}}{n      number of burn-in samples}
+\item{\code{gradTolInner}}{Numeric maximum gradient tolerance in the inner (Eta)
+optimization loop. Applicable to \code{FOCE-ELS} and
+\code{LAPLACIAN} methods.}
 
-\item{\code{xnonomegaburn}}{n   0 (default) or 1, to use non-omega burn-in}
+\item{\code{stepTolInner}}{Numeric maximum step tolerance in the inner (Eta)
+optimization loop. Applicable to \code{FOCE-ELS} and
+\code{LAPLACIAN} methods.}
 
-\item{\code{xnoburn}}{n   0 (default) or 1, to suppress burn-in}
+\item{\code{refDeltaLagl}}{Numeric LL Delta tolerance value used during
+Theta/Omega/Sigma optimization. Applicable to \code{FOCE-ELS} and
+\code{LAPLACIAN} methods.}
 
-\item{\code{xstartfromsavedposteriors}}{n   0 (default) or 1, to start from saved posteriors}
+\item{\code{isPCWRES}}{numeric; Flag indicating if Population Conditional Weighted
+Residuals (PCWRES) should be computed.  A value of 1 indicates computation,
+while 0 indicates no computation. Only applicable to population models.}
 
-\item{\code{xaccratio}}{n    acceptance ratio}
+\item{\code{xpcwresnrep}}{numeric; Stores the number of simulation replicates used
+for PCWRES computation.  Applicable only when \code{isPCWRES} is 1.}
 
-\item{\code{xscramble}}{n    0 for None, 1 for Owen, 2 for Faure-Tezuka}
+\item{\code{xisample}}{numeric; Specifies the number of sample points used in the
+QRPEM algorithm. Only applicable when \code{method} is \code{QRPEM}.}
 
-\item{\code{pardern}}{n      partial derivative # steps}
+\item{\code{xmapassist}}{numeric; Controls the use of MAP assistance in the QRPEM
+  algorithm.
+\itemize{
+  \item 0: No MAP assistance.
+  \item >0: The inner ETAs optimization loop is used in the QRPEM outer
+   optimization loop with a periodicity equal to the value of \code{xmapassist}.
+}
+  Only applicable when \code{method} is \code{QRPEM}.}
 
-\item{\code{parderd}}{n      partial derivative delta}
+\item{\code{xmapnp}}{numeric; Specifies the number of iterations for a preliminary
+Naive-Pooled optimization run before the main estimation. Applicable when
+the method is not \code{NAIVE-POOLED}.}
 
-\item{\code{logtran}}{n      0, or 1(default) to enable log-translate of data}
+\item{\code{ximpsampdof}}{numeric; Controls the importance sampling distribution used
+  in the QRPEM algorithm. Only applicable when \code{method} is \code{QRPEM}.
+\itemize{
+ \item 0: Multivariate Normal distribution.
+ \item 1: Multivariate Double Exponential (Laplace) distribution.
+ \item 2: Direct sampling from the prior.
+ \item 3-30: Multivariate T distribution with degrees of freedom equal to the value of \code{ximpsampdof}.
+ \item -2: Mixture-2 distribution.
+ \item -3: Mixture-3 distribution.
+}}
+
+\item{\code{xmcpem}}{numeric; Controls the sampling method used in the QRPEM
+  algorithm.
+\itemize{
+  \item 0: Quasi-Random sampling.
+  \item 1: Monte-Carlo sampling.
+}
+  Only applicable when \code{method} is \code{QRPEM}.}
+
+\item{\code{xpemrunall}}{numeric; Set to \code{1} to execute all requested
+iterations specified in \code{numIterations}. Only applicable to population
+models with \code{method = "QRPEM"}.}
+
+\item{\code{xsirsamp}}{numeric; Specifies the number of samples per eta per subject
+used in the Sampling Importance Resampling (SIR) algorithm within QRPEM.
+Only applicable when \code{method} is \code{QRPEM}.}
+
+\item{\code{xburnin}}{numeric; Specifies the number of burn-in iterations in the
+QRPEM algorithm.  During burn-in, omegas can be frozen (see
+\code{xnonomegaburn}). Only applicable when \code{method} is \code{QRPEM}.}
+
+\item{\code{xnonomegaburn}}{numeric; Controls whether omegas are frozen during the
+  burn-in phase of the QRPEM algorithm.
+\itemize{
+  \item 0: burn-in with frozen omegas is off.
+  \item 1: burn-in with frozen omegas is on.
+}
+  Only applicable when \code{method} is \code{QRPEM}. See also
+  \code{xburnin}.}
+
+\item{\code{xaccratio}}{numeric; Specifies the acceptance ratio used in the QRPEM
+algorithm for scaling the covariance matrix. Only applicable when
+\code{method} is \code{QRPEM}. Only applicable to population models with
+\code{method = "QRPEM"}.}
+
+\item{\code{xscramble}}{numeric; Specifies the scrambling method for quasi-random
+  number generation in the QRPEM algorithm.
+\itemize{
+  \item 0: No scrambling.
+  \item 1: Owen-type scrambling.
+  \item 2: Faure-Tezuka scrambling.
+}
+  Only applicable when \code{method} is \code{QRPEM}.}
+
+\item{\code{emTolType}}{Numeric specifying QRPEM convergence check type:
+\describe{
+  \item{0}{Default (no rollout, LL & Thetas)}
+  \item{1}{LL & Params with rollout}
+  \item{2}{LL with rollout}
+  \item{3}{Params with rollout}
+}
+Only applicable when \code{method} is \code{QRPEM}.}
+
+\item{\code{emConvLen}}{Numeric specifying the number of iterations to check for
+convergence. Only applicable when \code{method} is \code{QRPEM}.}
+
+\item{\code{emConvCritVal}}{Numeric specifying the convergence critical value. Only
+applicable when \code{method} is \code{QRPEM}.}
+
+\item{\code{pardern}}{numeric; Specifies the number of time steps used for outputting
+partial derivatives of observed variables with respect to parameters. Only
+applicable to individual models.}
+
+\item{\code{parderd}}{numeric; Specifies the step size for numerical calculation of
+partial derivatives of observed variables with respect to parameters. Only
+applicable to individual models.}
+
+\item{\code{logtran}}{numeric; Engine flag controlling log-transformation behavior
+for single LogAdditive error model.}
 }}
 
 \examples{
@@ -104,5 +254,8 @@ param <- NlmeEngineExtraParams(
   isPopulation = TRUE,
   odeToUse = 2
 )
+}
+\seealso{
+[engineParams()]
 }
 \keyword{internal}

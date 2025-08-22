@@ -23,12 +23,14 @@
 #'   parameter is set to \code{TRUE}.
 #' @examples
 #' \donttest{
-#'   result <- obtain_NLMELicense("C:/Program Files/Certara/NLME_Engine", verbose = TRUE)
-#'   if (result) {
-#'     message("License obtained successfully!")
-#'   } else {
-#'     message("Failed to obtain license.")
-#'   }
+#' INSTALLDIR <- Sys.getenv("INSTALLDIR")
+#' if (INSTALLDIR == "") INSTALLDIR <- "C:/Program Files/Certara/NLME_Engine"
+#' result <- obtain_NLMELicense(INSTALLDIR, verbose = TRUE)
+#' if (result) {
+#'   message("License obtained successfully!")
+#' } else {
+#'   message("Failed to obtain license.")
+#' }
 #' }
 #' @export
 obtain_NLMELicense <-
@@ -217,12 +219,11 @@ obtain_NLMELicense <-
 #' tool to log out the user, and attempts to remove the NLME license.
 #' @examples
 #' \donttest{
-#'   result <- remove_NLMELicense("/path/to/install/dir")
-#'   if (result) {
-#'     message("License removed successfully!")
-#'   } else {
-#'     message("Failed to remove license.")
-#'   }
+#' INSTALLDIR <- Sys.getenv("INSTALLDIR")
+#' if (INSTALLDIR == "") INSTALLDIR <- "C:/Program Files/Certara/NLME_Engine"
+#' if (FALSE) { # to prevent unintended logout
+#'   result <- remove_NLMELicense(INSTALLDIR)
+#' }
 #' }
 #' @export
 remove_NLMELicense <-

@@ -1,6 +1,8 @@
 #' Save model object to .rda file
 #'
-#' Saves the model, engine, and host objects to a single \code{model.rda} file in model's working directory. If no working directory exists it will be created by default. Note, the names of model, engine, and host objects will be appended with name of model directory when reloading \code{model.rda} file to global environment.
+#' Saves the model, engine, and host objects to a single \code{model.rda} file
+#' in model's working directory. If no working directory exists it will be
+#' created by default.
 #'
 #' @param model    NlmePmlModel object
 #' @param engine   Optional engine parameters to save with model
@@ -8,9 +10,18 @@
 #'
 #' @examples
 #' \donttest{
-#' saveModel(model)
+#' model <- emaxmodel(
+#'   checkBaseline = TRUE,
+#'   checkFractional = TRUE,
+#'   checkInhibitory = TRUE,
+#'   data = pkpdData,
+#'   ID = "ID",
+#'   C = "CObs",
+#'   EObs = "EObs",
+#'   workingDir = tempdir()
+#' )
 #'
-#' loadModel("model.rda")
+#' saveModel(model)
 #' }
 #'
 #' @export
@@ -20,14 +31,14 @@ saveModel <- function(model,
                       engine = NULL,
                       host = NULL) {
   # deparse(substitute(modelpk))
-  stopifnot(inherits(model[1] == "NlmePmlModel"))
+  stopifnot(inherits(model, "NlmePmlModel"))
 
   if (!is.null(engine)) {
-    stopifnot(inherits(engine[1] == "NlmeEngineExtraParams"))
+    stopifnot(inherits(engine, "NlmeEngineExtraParams"))
   }
 
   if (!is.null(host)) {
-    stopifnot(inherits(host[1], "NlmeParallelHost"))
+    stopifnot(inherits(host, "NlmeParallelHost"))
   }
 
   wd <- model@modelInfo@workingDir
@@ -70,6 +81,8 @@ saveModel <- function(model,
       file = m_path
     )
   }
+
+  invisible(NULL)
 }
 
 
@@ -79,9 +92,29 @@ saveModel <- function(model,
 #'
 #' @param directory    Directory where the model was saved
 #'
+#' @details
+#' Note, the names of model, engine, and host objects will
+#' be appended with name of model directory when reloading \code{model.rda} file
+#' to global environment.
+#'
 #' @examples
 #' \donttest{
-#' loadModel(directory)
+#' TempDir <- tempdir()
+#' model <- emaxmodel(
+#'   checkBaseline = TRUE,
+#'   checkFractional = TRUE,
+#'   checkInhibitory = TRUE,
+#'   data = pkpdData,
+#'   ID = "ID",
+#'   C = "CObs",
+#'   EObs = "EObs",
+#'   modelName = "model",
+#'   workingDir = TempDir
+#' )
+#'
+#' saveModel(model)
+#'
+#' loadModel(TempDir)
 #' }
 #'
 #' @export

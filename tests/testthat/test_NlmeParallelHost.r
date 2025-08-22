@@ -44,7 +44,7 @@ test_that("hostParams function works with all arguments", {
   testthat::expect_snapshot_output(print(hostParams(sharedDirectory = "sharedDirectoryPath",
                                                     installationDirectory = "installationDirectoryPath",
                                                     hostName = "Test",
-                                                    hostType = "Linux",
+                                                    hostType = "UBUNTU",
                                                     numCores = 2,
                                                     parallelMethod = "LSF",
                                                     userName = "test",

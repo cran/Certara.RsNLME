@@ -34,7 +34,8 @@ model <- pkmodel(
   Time = "Act_Time",
   A1 = "Amount",
   CObs = "Conc",
-  modelName = "TwCpt_IVBolus_FOCE_ELS"
+  modelName = "TwCpt_IVBolus_FOCE_ELS",
+  workingDir = tempdir()
   )
 
 # View initial/current fixed effect values

@@ -3,8 +3,6 @@ test_that("class running a VPC simulation  ", {
   testthat::skip_if(Sys.getenv("INSTALLDIR") == "",
                     message = "cannot start the test, INSTALLDIR variable is not specified.")
 
-  testthat::skip()
-
   workingDir = tempdir(TRUE)
   NLME_ROOT_DIRECTORY <- file.path(workingDir, "VPCTest")
   dir.create(NLME_ROOT_DIRECTORY)

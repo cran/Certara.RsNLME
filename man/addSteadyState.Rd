@@ -23,6 +23,16 @@ Use to add Steady State column definition statement to \code{model@userDefinedEx
 }
 \examples{
 \donttest{
-model <- addSteadyState(model, SS = "ss", II = "ii")
+pkData1 <- pkData
+pkData1$SS <- 0
+pkData1$II <- 0
+model <- pkmodel(data = pkData1,
+                 ID = "Subject",
+                 Time = "Act_Time",
+                 A1 = "Amount",
+                 CObs = "Conc",
+                 workingDir = tempdir()
+                 )
+model <- addSteadyState(model, SS = "SS", II = "II")
 }
 }

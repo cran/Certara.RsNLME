@@ -53,13 +53,32 @@ Perform visual predictive check for NLME models
 }
 \examples{
 \donttest{
+model <- pkmodel(
+  numComp = 1,
+  absorption = "Extravascular",
+  ID = "Subject",
+  Time = "Act_Time",
+  CObs = "Conc",
+  Aa = "Amount",
+  data = pkData,
+  modelName = "PkModel",
+  workingDir = tempdir()
+)
 
-job <- fitmodel(model)
+ host <- hostParams(
+  sharedDirectory = tempdir(),
+  parallelMethod = "NONE",
+  hostName = "local",
+  numCores = 1
+ )
 
-# View estimation results
-print(job)
+job <- fitmodel(model = model,
+                hostPlatform = host)
 
-finalModelVPC <- copyModel(model, acceptAllEffects = TRUE, modelName = "model_VPC")
+finalModelVPC <- copyModel(model,
+                           acceptAllEffects = TRUE,
+                           modelName = "model_VPC",
+                           workingDir = tempdir())
 
 # View the model
 print(finalModelVPC)
@@ -68,9 +87,9 @@ print(finalModelVPC)
 vpcSetup <- NlmeVpcParams(outputPRED = TRUE)
 
 # Run VPC using the default host, default values for the relevant NLME engine arguments
-finalVPCJob <- vpcmodel(model = finalModelVPC, vpcParams = vpcSetup)
+finalVPCJob <- vpcmodel(model = finalModelVPC, vpcParams = vpcSetup, hostPlatform = host)
 # the same as:
-finalVPCJob <- vpcmodel(model = finalModelVPC, outputPRED = TRUE)
+# finalVPCJob <- vpcmodel(model = finalModelVPC, outputPRED = TRUE)
 
 # Observed dataset predcheck0.csv
 dt_ObsData <- finalVPCJob$predcheck0
@@ -83,23 +102,23 @@ dt_ObsData$PRED <- dt_SimData[REPLICATE == 0]$PRED
 
 # tidyvpc package VPC example:
 # library(tidyvpc)
-library(magrittr)
+# library(magrittr)
 # Create a regular VPC plot with binning method set to be "jenks"
-binned_VPC <- observed(dt_ObsData, x = IVAR, yobs = DV) \%>\%
-  simulated(dt_SimData, ysim = DV) \%>\%
-  binning(bin = "jenks") \%>\%
-  vpcstats()
+# binned_VPC <- observed(dt_ObsData, x = IVAR, yobs = DV) \%>\%
+# simulated(dt_SimData, ysim = DV) \%>\%
+# binning(bin = "jenks") \%>\%
+# vpcstats()
 
-plot_binned_VPC <- plot(binned_VPC)
+# plot_binned_VPC <- plot(binned_VPC)
 
 # Create a pcVPC plot with binning method set to be "jenks"
-binned_pcVPC <- observed(dt_ObsData, x = IVAR, yobs = DV) \%>\%
-  simulated(dt_SimData, ysim = DV) \%>\%
-  binning(bin = "jenks") \%>\%
-  predcorrect(pred = PRED) \%>\%
-  vpcstats()
+# binned_pcVPC <- observed(dt_ObsData, x = IVAR, yobs = DV) \%>\%
+#   simulated(dt_SimData, ysim = DV) \%>\%
+#   binning(bin = "jenks") \%>\%
+#   predcorrect(pred = PRED) \%>\%
+#   vpcstats()
 
-plot_binned_pcVPC <- plot(binned_pcVPC)
+# plot_binned_pcVPC <- plot(binned_pcVPC)
 }
 
 }

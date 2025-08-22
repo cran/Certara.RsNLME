@@ -6,6 +6,8 @@
 #'
 #' @examples
 #' \donttest{
+#' model <- pkmodel(columnMap = FALSE,
+#'                  workingDir = tempdir())
 #' modelVariableNames(model)
 #' }
 #'

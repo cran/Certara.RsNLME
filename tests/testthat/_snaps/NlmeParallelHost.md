@@ -7,7 +7,7 @@
     NLME Executables Directory  :  installationDirectoryPath
     Name of the host            :  Test
     Address of the host         :  127.0.0.1
-    Host System                 :  linux
+    Host System                 :  UBUNTU
     Number of cores             :  2
     Is host local               :  FALSE
     R Location                  :  

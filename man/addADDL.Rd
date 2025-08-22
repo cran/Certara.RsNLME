@@ -21,7 +21,19 @@ Specify ADDL column definition in model object instead of specifying ADDL throug
 }
 \examples{
 \donttest{
-model <- addADDL(model, ADDL = "addl", II = "ii")
+pkData1 <- pkData
+pkData1$ii <- 0
+pkData1$addl <- 0
+ model <- pkmodel(numComp = 2,
+                  absorption = "FirstOrder",
+                  ID = "Subject",
+                  Time = "Act_Time",
+                  CObs = "Conc",
+                  Aa = "Amount",
+                  data = pkData1,
+                  modelName = "PkModel",
+                  workingDir = tempdir())
+ model <- addADDL(model, ADDL = "addl", II = "ii")
 }
 
 }

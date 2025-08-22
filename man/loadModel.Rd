@@ -15,9 +15,29 @@ No value is returned. Model object is loaded in global environment.
 \description{
 Loads a previously saved model from disk.
 }
+\details{
+Note, the names of model, engine, and host objects will
+be appended with name of model directory when reloading \code{model.rda} file
+to global environment.
+}
 \examples{
 \donttest{
-loadModel(directory)
+TempDir <- tempdir()
+model <- emaxmodel(
+  checkBaseline = TRUE,
+  checkFractional = TRUE,
+  checkInhibitory = TRUE,
+  data = pkpdData,
+  ID = "ID",
+  C = "CObs",
+  EObs = "EObs",
+  modelName = "model",
+  workingDir = TempDir
+)
+
+saveModel(model)
+
+loadModel(TempDir)
 }
 
 }

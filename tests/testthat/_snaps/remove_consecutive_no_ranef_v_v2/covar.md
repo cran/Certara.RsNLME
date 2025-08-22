@@ -1,0 +1,4 @@
+# removeCovariate works correctly for multiple consecutive no-ranef params
+
+    "test(){\n    cfMicro(A1,Cl/V, Cl2/V, Cl2/V2, Cl3/V, Cl3/V3)\n    dosepoint(A1)\n    C = A1 / V\n    error(CEps=0.1)\n    observe(CObs=C * ( 1 + CEps))\n    stparm(V = tvV)\n    stparm(Cl = tvCl * exp(nCl + nClxOCC10*(OCC1==0) + nClxOCC11*(OCC1==1)))\n    stparm(V2 = (tvV2 ))\n    stparm(Cl2 = tvCl2 * exp(nCl2))\n    stparm(V3 = exp(tvV3 + nV3xOCC10*(OCC1==0) + nV3xOCC11*(OCC1==1)))\n    stparm(Cl3 = tvCl3 * exp(nCl3))\n    fcovariate(OCC1)\n    fixef( tvV = c(,1,))\n    fixef( tvCl = c(,1,))\n    fixef( tvV2 = c(,1,))\n    fixef( tvCl2 = c(,1,))\n    fixef( tvV3 = c(,1,))\n    fixef( tvCl3 = c(,1,))\n    ranef(diag(nCl,nCl2,nCl3) = c(1,1,1))\n    ranef(diag(nV3xOCC10,nClxOCC10) = c(0.13,0.1), same(nV3xOCC11,nClxOCC11))\n}"
+

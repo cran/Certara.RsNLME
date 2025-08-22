@@ -42,14 +42,13 @@ ESTARGS queue is executed first, SIMARGS queue is executed the second.
 }
 \examples{
 \donttest{
-# path to metamodel should be specified
-host <- hostParams(
-  parallelMethod = "LOCAL_MPI",
-  hostName = "local_mpi",
-  numCores = 4
-)
-directoryToRun <- normalizePath("./NLME/")
-run_metamodel("metamodel.mmdl", directoryToRun)
+mmdlfile <- system.file("extdata/mmdlNoTime/test.mmdl",
+                       package = "Certara.RsNLME",
+                       mustWork = TRUE)
+directoryToRun <- file.path(tempdir(TRUE), "MmdlNoTimeTest")
+# using default host
+mmdlResults <- run_metamodel(mmdlfile = mmdlfile,
+                             directoryToRun = directoryToRun)
 }
 
 }

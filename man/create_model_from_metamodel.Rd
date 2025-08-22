@@ -28,7 +28,10 @@ overview}.
 \examples{
  \donttest{
    ModelParamsList <-
-     create_model_from_metamodel(mmdlfile = "Inf1CPT.mmdl")
+     create_model_from_metamodel(
+       mmdlfile = system.file("extdata/mmdlNoTime", "test.mmdl",
+                              package = "Certara.RsNLME"),
+       directoryToRun = tempdir())
  }
 
 }

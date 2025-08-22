@@ -16,7 +16,8 @@
 #' @examples
 #' pkData$id2 <- pkData$Subject
 #' model <- pkmodel(columnMap = FALSE,
-#'                  data = pkData)
+#'                  data = pkData,
+#'                  workingDir = tempdir())
 #'
 #' modelvar <- unlist(modelVariableNames(model))
 #'

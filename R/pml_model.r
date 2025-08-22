@@ -43,10 +43,15 @@
 #' @include NlmeDataset.r
 #' @examples
 #' \donttest{
-#' NlmePmlModel()
+#' # helper class
+#' setClass("NlmePmlModelInfo",
+#'          slots = c(modelName = "character",
+#'                    workingDir = "character"))
+#' Model <-
+#'   new("NlmePmlModel",
+#'   modelInfo = new("NlmePmlModelInfo", modelName = "Model", workingDir = "."))
 #' }
 #'
-#' @export NlmePmlModel
 #' @keywords internal
 setClass(
   "NlmePmlModel",
@@ -223,13 +228,11 @@ print_IndirectAttributes <- function(x) {
   name <- .indirectTypeNames[x@indirectModelAttrs@type]
   cat("\n Indirect \n ------------------------------------------- \n")
   cat(paste("Indirect Type     : ", name), fill = TRUE)
-  cat(
-    paste(
-      "Effect Compartment: ",
-      x@indirectModelAttrs@hasEffectsCompartment
-    ),
-    fill = TRUE
-  )
+  cat(paste(
+    "Effect Compartment: ",
+    x@indirectModelAttrs@hasEffectsCompartment
+  ),
+  fill = TRUE)
   cat(paste("Buildup           : ", x@indirectModelAttrs@isBuildup),
       fill = TRUE)
   cat(paste("Exponent          : ", x@indirectModelAttrs@isExponent),
@@ -254,7 +257,9 @@ print_LinearAttributes <- function(x) {
 #' @inheritParams ellipsis::dots_used
 #'
 #' @examples
-#' model <- pkmodel(columnMap = FALSE, data = pkData)
+#' model <- pkmodel(columnMap = FALSE,
+#'                  data = pkData,
+#'                  workingDir = tempdir())
 #' print(model)
 #'
 #' @return \code{NULL}
@@ -470,16 +475,21 @@ print.NlmePmlModel <- function(x, ...) {
     warning("`id` model term will be ignored when the model is in individual mode.",
             call. = FALSE)
   } else if (!id_mapped && x@isPopulation) {
-    warning("`id` model term is not found, but the model is in pop mode.\n",
-            "Please use parsePMLColMap() to update the mapping and then map with colMapping().",
-            call. = FALSE)
+    warning(
+      "`id` model term is not found, but the model is in pop mode.\n",
+      "Please use parsePMLColMap() to update the mapping and then map with colMapping().",
+      call. = FALSE
+    )
   }
 }
 
-setMethod("show", "NlmePmlModel",
-          definition = function(object){
-            print(object)
-          })
+setMethod(
+  "show",
+  "NlmePmlModel",
+  definition = function(object) {
+    print(object)
+  }
+)
 
 setGeneric(
   name = "createIndirectStructuralParameters",
@@ -488,7 +498,9 @@ setGeneric(
   }
 )
 
-setMethod("createIndirectStructuralParameters", "NlmePmlModel",
+setMethod(
+  "createIndirectStructuralParameters",
+  "NlmePmlModel",
   definition = function(.Object) {
     structuralParams <- .Object@structuralParams
     dosePoints <- .Object@dosePoints
@@ -595,7 +607,9 @@ setGeneric(
   }
 )
 
-setMethod("modelColumnMapping", "NlmePmlModel",
+setMethod(
+  "modelColumnMapping",
+  "NlmePmlModel",
   definition = function(.Object) {
     map <- .Object@columnMapping
     return(map)
@@ -609,7 +623,9 @@ setGeneric(
   }
 )
 
-setMethod("modelColumnMapping<-", "NlmePmlModel",
+setMethod(
+  "modelColumnMapping<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     modelTermsToMap <- names(value)
     if (is.null(.Object@inputData)) {
@@ -620,7 +636,12 @@ setMethod("modelColumnMapping<-", "NlmePmlModel",
     mcolsNames <- names(mcols@mapping)
     `%notin%` <- Negate(`%in%`)
 
-    dt <- data.table::setDT(.Object@inputData)
+    if (is.null(.Object@inputData)) {
+      dt <- data.table::as.data.table(.Object@inputData)
+    } else {
+      dt <- data.table::setDT(.Object@inputData)
+    }
+
     for (modelTerm in modelTermsToMap) {
       columnToMap <- value[[modelTerm]]
       if (modelTerm %notin% mcolsNames) {
@@ -747,7 +768,9 @@ setGeneric(
   }
 )
 
-setMethod("modelDoseMapping", "NlmePmlModel",
+setMethod(
+  "modelDoseMapping",
+  "NlmePmlModel",
   definition = function(.Object) {
     map <- .Object@doseMapping
     return(map)
@@ -762,7 +785,9 @@ setGeneric(
   }
 )
 
-setMethod("modelDoseMapping<-", "NlmePmlModel",
+setMethod(
+  "modelDoseMapping<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     names <- names(value)
     for (i in 1:length(names)) {
@@ -799,7 +824,9 @@ setGeneric(
   }
 )
 
-setMethod("addExtraDose", "NlmePmlModel",
+setMethod(
+  "addExtraDose",
+  "NlmePmlModel",
   definition = function(.Object,
                         name,
                         doseType = "SteadyState",
@@ -902,7 +929,9 @@ setGeneric(
   }
 )
 
-setMethod("modelParamsMapping", "NlmePmlModel",
+setMethod(
+  "modelParamsMapping",
+  "NlmePmlModel",
   definition = function(.Object) {
     map <- attr(.Object, "paramsMapping")
     return(map)
@@ -917,7 +946,9 @@ setGeneric(
   }
 )
 
-setMethod("modelRandParamsMapping", "NlmePmlModel",
+setMethod(
+  "modelRandParamsMapping",
+  "NlmePmlModel",
   definition = function(.Object) {
     map <- .Object@randParamsMapping
     return(map)
@@ -932,7 +963,9 @@ setGeneric(
   }
 )
 
-setMethod("modelRandParamsMapping<-", "NlmePmlModel",
+setMethod(
+  "modelRandParamsMapping<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     if (is.null(.Object@inputData)) {
       stop("missing input data, use `initRandParamsMapping()` to specify input data")
@@ -975,7 +1008,9 @@ setGeneric(
   }
 )
 
-setMethod("initColMapping<-", "NlmePmlModel",
+setMethod(
+  "initColMapping<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     .Object@columnMapping <- NlmeColumnMapping(.Object, value)
     .Object@inputData <- value
@@ -990,7 +1025,9 @@ setGeneric(
   }
 )
 
-setMethod("initDoseColMapping<-", "NlmePmlModel",
+setMethod(
+  "initDoseColMapping<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     map <- NlmeDoseMapping(.Object, value)
     .Object@doseMapping <- map
@@ -1006,7 +1043,9 @@ setGeneric(
   }
 )
 
-setMethod("initParamsMapping<-", "NlmePmlModel",
+setMethod(
+  "initParamsMapping<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     map <- NlmeParamsMapping(.Object, value)
     .Object@paramsMapping <- map
@@ -1023,7 +1062,9 @@ setGeneric(
   }
 )
 
-setMethod("initRandParamsMapping<-", "NlmePmlModel",
+setMethod(
+  "initRandParamsMapping<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     map <- NlmeRandParamsMapping(.Object, value)
     .Object@randParamsMapping <- map
@@ -1040,7 +1081,9 @@ setGeneric(
   }
 )
 
-setMethod("mappedColumn<-", "NlmePmlModel",
+setMethod(
+  "mappedColumn<-",
+  "NlmePmlModel",
   definition = function(.Object, varName, value) {
     if (.Object@isTextual) {
       map <- .Object@columnMapping
@@ -1067,7 +1110,9 @@ setGeneric(
   }
 )
 
-setMethod("mappedDose<-", "NlmePmlModel",
+setMethod(
+  "mappedDose<-",
+  "NlmePmlModel",
   definition = function(.Object, varName, value) {
     names <- doseNames(.Object)
     if (!is.na(match(varName, names))) {
@@ -1090,7 +1135,9 @@ setGeneric(
   }
 )
 
-setMethod("mappedRandParams<-", "NlmePmlModel",
+setMethod(
+  "mappedRandParams<-",
+  "NlmePmlModel",
   definition = function(.Object, varName, value) {
     names <- randParameterNames(.Object)
     if (!is.na(match(varName, names))) {
@@ -1120,7 +1167,9 @@ setGeneric(
   }
 )
 
-setMethod("residualEffect<-", "NlmePmlModel",
+setMethod(
+  "residualEffect<-",
+  "NlmePmlModel",
   definition = function(.Object, effectName, value) {
     obsCompIndx <- -1
     errorModel <- attr(.Object, "errorModel")
@@ -1210,17 +1259,19 @@ setGeneric(
   }
 )
 
-setMethod("covariateEffect<-", "NlmePmlModel",
+setMethod(
+  "covariateEffect<-",
+  "NlmePmlModel",
   definition = function(.Object,
                         covariateName,
                         parameterName,
                         value) {
-
     ModelCovNames <- covariateNames(.Object)
     if (length(ModelCovNames) > 0) {
       whichName <- which(ModelCovNames == covariateName)
       if (length(whichName) > 0) {
-        .Object@covariateList[[whichName]]@covarEffList[[parameterName]] <- value
+        .Object@covariateList[[whichName]]@covarEffList[[parameterName]] <-
+          value
       } else {
         message("Covariate ", covariateName, " is not found in the model.")
       }
@@ -1254,40 +1305,26 @@ setMethod("covariateEffect<-", "NlmePmlModel",
 #'
 #' @param .Object          A PK/PD model
 #' @param covariateName    Name of the occasion covariate
-#' @param parameterName    Name of structural parameter
 #' @param value            A value to be set
 #' @keywords internal
 #' @noRd
-setGeneric(
-  name = "initOccasionRandomEffect<-",
-  def = function(.Object,
-                 covariateName,
-                 parameterName,
-                 value) {
-    standardGeneric("initOccasionRandomEffect<-")
-  }
-)
-
-setMethod("initOccasionRandomEffect<-", "NlmePmlModel",
-  definition = function(.Object,
-                        covariateName,
-                        parameterName,
-                        value) {
+initOccasionRandomEffect <-
+  function(.Object,
+           covariateName,
+           values) {
     covariateList <- .Object@covariateList
-    for (indx in 1:length(covariateList)) {
-      c <- covariateList[[indx]]
-      name <- c@name
-      type <- c@type
-      if (name == covariateName && type == Occasion) {
-        c@catEffInitValues <- as.list(value)
-        covariateList[[indx]] <- c
+    for (indx in seq_along(covariateList)) {
+      CovariateInstance <- covariateList[[indx]]
+
+      if (CovariateInstance@name == covariateName &&
+          CovariateInstance@type == Occasion) {
+        covariateList[[indx]]@catEffInitValues <- as.list(values)
       }
     }
+
     .Object@covariateList <- covariateList
-    .Object <- generatePML(.Object)
-    return(.Object)
+    .Object
   }
-)
 
 #' Lists user defined extra column/table definition
 #'
@@ -1309,7 +1346,9 @@ setGeneric(
   }
 )
 
-setMethod("userDefinedExtraDefinitions", "NlmePmlModel",
+setMethod(
+  "userDefinedExtraDefinitions",
+  "NlmePmlModel",
   definition = function(.Object, userDefinedList) {
     userDefinedExtraDefs <- .Object@userDefinedExtraDefs
 
@@ -1341,7 +1380,9 @@ setGeneric(
 )
 
 
-setMethod("userDefinedExtraDefinitions<-", "NlmePmlModel",
+setMethod(
+  "userDefinedExtraDefinitions<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     .Object@userDefinedExtraDefs <- as.list(value)
 
@@ -1360,7 +1401,10 @@ setMethod("userDefinedExtraDefinitions<-", "NlmePmlModel",
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
 #' \donttest{
-#' model <- addExtraDef(model, c("addlcol(ADDL)", "table(file=\"res.csv\",time(0),Ka,V,Cl,Tlg)"))
+#' model <- pkmodel(columnMap = FALSE,
+#'                  workingDir = tempdir())
+#' model <- addExtraDef(model, c("addlcol(ADDL)",
+#'                               "table(file=\"res.csv\",time(0),Ka,V,Cl,Tlg)"))
 #' }
 #'
 #' @export
@@ -1394,10 +1438,13 @@ addExtraDef <- function(.Object, value) {
 #'
 #' @examples
 #' \donttest{
-#' model <- addSecondary(model, "Spc_Param", "log(2)/tvKe")
+#' model <- pkmodel(columnMap = FALSE,
+#'                  absorption = "FirstOrder",
+#'                  workingDir = tempdir())
+#' model <- addSecondary(model, "Ke", "tvCl/tvV")
 #' model <- addSecondary(
 #'   model, "Tmax",
-#'   "CalcTMax(tvA,tvAlpha,tvB,tvBeta,C,Gamma)"
+#'   "CalcTMax(tvA,tvCl/tvV)"
 #' )
 #' }
 #'
@@ -1425,7 +1472,9 @@ setGeneric(
 #' @return Returns the 'NlmePmlModel' object with the added secondary parameter.
 #'
 #' @export
-setMethod("addSecondary", "NlmePmlModel",
+setMethod(
+  "addSecondary",
+  "NlmePmlModel",
   definition = function(.Object, name, definition, unit = "") {
     secondParams <- .Object@secondaryParameters
     found <- FALSE
@@ -1455,7 +1504,9 @@ setGeneric(
   }
 )
 
-setMethod("listSecondary", "NlmePmlModel",
+setMethod(
+  "listSecondary",
+  "NlmePmlModel",
   definition = function(.Object) {
     secondParams <- .Object@secondaryParameters
     return(secondParams)
@@ -1492,7 +1543,9 @@ setGeneric(
 #' @return Returns the 'NlmePmlModel' object with the secondary parameter removed.
 #'
 #' @keywords internal
-setMethod("deleteSecondary", "NlmePmlModel",
+setMethod(
+  "deleteSecondary",
+  "NlmePmlModel",
   definition = function(.Object, name) {
     secondParams <- .Object@secondaryParameters
     found <- FALSE
@@ -1527,6 +1580,7 @@ setMethod("deleteSecondary", "NlmePmlModel",
 #'
 #' structuralParam(model, "Cl2") <- c(style = Custom, code = "stparm(V=10^(tvlog10V + nlog10V))")
 #' }
+#' @noRd
 #' @keywords internal
 setGeneric(
   name = "structuralParam<-",
@@ -1535,7 +1589,9 @@ setGeneric(
   }
 )
 
-setMethod("structuralParam<-", "NlmePmlModel",
+setMethod(
+  "structuralParam<-",
+  "NlmePmlModel",
   definition = function(.Object, parameterNames, value) {
     sps <- .Object@structuralParams
     for (parameterName in parameterNames) {
@@ -1654,7 +1710,9 @@ setGeneric(
   }
 )
 
-setMethod("modelStatements", "NlmePmlModel",
+setMethod(
+  "modelStatements",
+  "NlmePmlModel",
   definition = function(.Object) {
     statements <- .Object@statements
     return(statements)
@@ -1668,7 +1726,9 @@ setGeneric(
   }
 )
 
-setMethod(f = "modelStatements<-", "NlmePmlModel",
+setMethod(
+  f = "modelStatements<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     .Object@statements <- value
     return(.Object)
@@ -1708,6 +1768,7 @@ setMethod(f = "modelStatements<-", "NlmePmlModel",
 #'
 #' Updates error model, recreating some structural parameters
 #' that depend on how residual effects are used
+#' @noRd
 #' @keywords internal
 setGeneric(
   name = "updateErrorModel",
@@ -1716,7 +1777,9 @@ setGeneric(
   }
 )
 
-setMethod("updateErrorModel", "NlmePmlModel",
+setMethod(
+  "updateErrorModel",
+  "NlmePmlModel",
   definition = function(.Object) {
     errorModel <- attr(.Object, "errorModel")
     effectsList <- attr(errorModel, "effectsList")
@@ -1761,7 +1824,9 @@ setGeneric(
   }
 )
 
-setMethod("createEmaxStructuralParameters", "NlmePmlModel",
+setMethod(
+  "createEmaxStructuralParameters",
+  "NlmePmlModel",
   definition = function(.Object) {
     structuralParams <- attr(.Object, "structuralParams")
     dosePoints <- attr(.Object, "dosePoints")
@@ -1861,7 +1926,9 @@ setGeneric(
   }
 )
 
-setMethod("createLinearStructuralParameters", "NlmePmlModel",
+setMethod(
+  "createLinearStructuralParameters",
+  "NlmePmlModel",
   definition = function(.Object) {
     structuralParams <- attr(.Object, "structuralParams")
     dosePoints <- attr(.Object, "dosePoints")
@@ -1933,7 +2000,9 @@ setGeneric(
   }
 )
 
-setMethod("createPkStructuralParameters", "NlmePmlModel",
+setMethod(
+  "createPkStructuralParameters",
+  "NlmePmlModel",
   definition = function(.Object) {
     structuralParams <- attr(.Object, "structuralParams")
     dosePoints <- attr(.Object, "dosePoints")
@@ -2216,13 +2285,16 @@ setMethod("createPkStructuralParameters", "NlmePmlModel",
   }
 )
 
-setGeneric("generateLinearModel",
+setGeneric(
+  "generateLinearModel",
   def = function(.Object, scInput) {
     standardGeneric("generateLinearModel")
   }
 )
 
-setMethod("generateLinearModel", "NlmePmlModel",
+setMethod(
+  "generateLinearModel",
+  "NlmePmlModel",
   definition = function(.Object, scInput) {
     statements <- attr(.Object, "statements")
     if (length(statements) == 0) {
@@ -2260,13 +2332,16 @@ setMethod("generateLinearModel", "NlmePmlModel",
 )
 
 
-setGeneric("generateEffectsModel",
+setGeneric(
+  "generateEffectsModel",
   def = function(.Object, scInput, frozen) {
     standardGeneric("generateEffectsModel")
   }
 )
 
-setMethod("generateEffectsModel", "NlmePmlModel",
+setMethod(
+  "generateEffectsModel",
+  "NlmePmlModel",
   definition = function(.Object, scInput, frozen) {
     statements <- attr(.Object, "statements")
     isPopulation <- attr(.Object, "isPopulation")
@@ -2292,13 +2367,16 @@ setMethod("generateEffectsModel", "NlmePmlModel",
   }
 )
 
-setGeneric("generateEmaxModel",
+setGeneric(
+  "generateEmaxModel",
   def = function(.Object, scInput) {
     standardGeneric("generateEmaxModel")
   }
 )
 
-setMethod("generateEmaxModel", "NlmePmlModel",
+setMethod(
+  "generateEmaxModel",
+  "NlmePmlModel",
   definition = function(.Object, scInput) {
     statements <- attr(.Object, "statements")
     if (length(statements) == 0) {
@@ -2400,13 +2478,16 @@ setMethod("generateEmaxModel", "NlmePmlModel",
 )
 
 
-setGeneric("generatePkModel",
+setGeneric(
+  "generatePkModel",
   def = function(.Object) {
     standardGeneric("generatePkModel")
   }
 )
 
-setMethod("generatePkModel", "NlmePmlModel",
+setMethod(
+  "generatePkModel",
+  "NlmePmlModel",
   definition = function(.Object) {
     statements <- attr(.Object, "statements")
     if (length(statements) == 0) {
@@ -2759,7 +2840,8 @@ setMethod("generatePkModel", "NlmePmlModel",
     .Object@dosePoints <- dosePoints
     .Object@outputParams <- outputParams
     .Object@diffEquations <- diffEquations
-    return(.Object)
+
+    .Object
   }
 )
 
@@ -2809,38 +2891,39 @@ getContinuousEffectsString <-
         name <- paste0("(1+", name, operation2, effName, ")")
       }
     }
-    return(name)
+
+    name
   }
 
 
 getCovariateEffNames <- function(model) {
-  names <- c()
   structuralParams <- model@structuralParams
   covariateList <- model@covariateList
 
-  if (length(structuralParams) > 0) {
-    for (i in 1:length(structuralParams)) {
-      stp <- structuralParams[[i]]
-      name <- stp@name
-      style <- stp@style
-      fixedEffName <- stp@fixedEffName
-      if (fixedEffName != "") {
-        if (length(covariateList) > 0) {
-          for (indx in 1:length(covariateList)) {
-            strArray <- generateCovariateNames(name,
-                                               covariateList[[indx]],
-                                               style)
-            if (length(strArray) != 0) {
-              for (s in unlist(strArray)) {
-                names <- c(names, s)
-              }
-            }
-          }
-        }
-      }
+  if (length(structuralParams) == 0) {
+    return(c())
+  }
+
+  AllCovariateEffNames <- c()
+  for (i in seq_along(structuralParams)) {
+    StParmInstance <- structuralParams[[i]]
+
+    if (StParmInstance@fixedEffName == "")
+      next
+
+    for (indx in seq_along(covariateList)) {
+      CovariateEffNames <- generateCovariateNames(StParmInstance@name,
+                                                  covariateList[[indx]],
+                                                  StParmInstance@style)
+      if (length(CovariateEffNames) == 0)
+        next
+
+      AllCovariateEffNames <-
+        c(AllCovariateEffNames, unlist(CovariateEffNames))
     }
   }
-  return(names)
+
+  AllCovariateEffNames
 }
 
 #'
@@ -2871,7 +2954,8 @@ getCovariateEffDirection <- function(model) {
       }
     }
   }
-  return(direction)
+
+  direction
 }
 
 #'
@@ -2879,386 +2963,347 @@ getCategoryEffectString <-
   function(usageType, stpName, covarName, indx) {
     effectName <- paste0("d", stpName, "d", covarName, indx)
     if (usageType == COVAR_EFF_YES) {
-      name <- paste0(paste0(effectName, "*(", covarName, "==", indx, ")"))
+      CategoryEffectString <-
+        paste0(effectName, "*(", covarName, "==", indx, ")")
       ##        name=paste0(paste0("exp(",effectName,"*(",covarName,"==",indx,"))"))
     } else if (usageType == COVAR_EFF_PLUS_ONE) {
-      name <-
-        paste0(paste0("(1+", effectName, "*(", covarName, "==", indx, "))"))
+      CategoryEffectString <-
+        paste0("(1+", effectName, "*(", covarName, "==", indx, "))")
+    } else {
+      stop("Invalid usageType")
     }
     #    return(paste0(effectName,"*(",covarName,"==",indx,")"))
-    return(name)
+    return(CategoryEffectString)
   }
 
 
 getOccasionEffectString <-
   function(usageType, stpName, covarName, indx) {
-    effectName <- paste0("n", stpName, "x", indx)
+    effectName <- paste0("n", stpName, "x", covarName, indx)
     if (usageType == COVAR_EFF_YES) {
-      name <- paste0(paste0(effectName, "*(", covarName, "==", indx, ")"))
-      #        name=paste0(paste0("exp(",effectName,"*(",covarName,"==",indx,"))"))
+      OccasionEffectString <-
+        paste0(effectName, "*(", covarName, "==", indx, ")")
     } else if (usageType == COVAR_EFF_PLUS_ONE) {
-      name <-
-        paste0(paste0("(1+", effectName, "*(", covarName, "==", indx, "))"))
+      OccasionEffectString <-
+        paste0("(1+", effectName, "*(", covarName, "==", indx, "))")
+    } else {
+      stop("Invalid usageType")
     }
-    return(name)
+
+    return(OccasionEffectString)
   }
 
-generateCovariateEffects <- function(stpName, covariate, style) {
-  ret <- c()
-  c <- covariate
-  covarEffList <- attr(c, "covarEffList")
-  usageType <- covarEffList[[stpName]]
+generateCovariateEffects <-
+  function(stpName, CovariateInstance, style) {
+    covarEffList <- CovariateInstance@covarEffList
+    usageType <- covarEffList[[stpName]]
 
-  sList <- list()
-  if (length(usageType) == 0) {
-    usageType <- COVAR_EFF_NO
-  }
-  if (usageType != COVAR_EFF_NO) {
-    covarName <- attr(c, "name")
-    type <- attr(c, "type")
-    centerValue <- attr(c, "centerValue")
-    effType <- attr(c, "continuousType")
-    isPositive <- attr(c, "isPositive")
+    ret <- c()
+    if (length(usageType) == 0 || usageType == COVAR_EFF_NO) {
+      return(ret)
+    }
+
+    covarName <- CovariateInstance@name
+    type <- CovariateInstance@type
+    centerValue <- CovariateInstance@centerValue
+    effType <- CovariateInstance@continuousType
+    isPositive <- CovariateInstance@isPositive
     effName <- paste0("d", stpName, "d", covarName)
     if (type == COVAR_CONTINUOUS) {
-      s <- getContinuousEffectsString(usageType,
-                                      covarName,
-                                      effName,
-                                      effType,
-                                      isPositive,
-                                      centerValue,
-                                      style)
-      ret <- c(ret, s)
-    } else if (type == Category) {
-      sList <- list()
-      items <- attr(c, "covarItems")
-      for (i in 2:length(items)) {
-        item <- items[[i]]
-        val <- attr(item, "value")
-        s <-
+      ContinuousEffectsString <- getContinuousEffectsString(usageType,
+                                                            covarName,
+                                                            effName,
+                                                            effType,
+                                                            isPositive,
+                                                            centerValue,
+                                                            style)
+      return(ContinuousEffectsString)
+    }
+
+    items <- CovariateInstance@covarItems
+
+    for (i in seq_along(items)) {
+      if (type == Category && i == 1)
+        next # reference category
+
+      item <- items[[i]]
+      val <- item@value
+      if (type == Category) {
+        EffectString <-
           getCategoryEffectString(usageType, stpName, covarName, val)
-        ret <- c(ret, s)
-      }
-    } else if (type == COVAR_OCCASION) {
-      sList <- list()
-      items <- attr(c, "covarItems")
-      for (i in 1:length(items)) {
-        item <- items[[i]]
-        val <- attr(item, "value")
-        s <-
+      } else if (type == COVAR_OCCASION) {
+        EffectString <-
           getOccasionEffectString(usageType, stpName, covarName, val)
-        ret <- c(ret, s)
       }
+
+      ret <- c(ret, EffectString)
     }
-  }
-  return(ret)
-}
 
-generateCovariateNames <- function(stpName, covariate, style) {
-  ret <- c()
-  c <- covariate
-  covarEffList <- attr(c, "covarEffList")
-  usageType <- covarEffList[[stpName]]
-
-  sList <- list()
-  if (length(usageType) == 0) {
-    usageType <- COVAR_EFF_NO
+    ret
   }
-  if (usageType != COVAR_EFF_NO) {
-    covarName <- attr(c, "name")
-    type <- attr(c, "type")
+
+generateCovariateNames <-
+  function(stpName, CovariateInstance, style) {
+    covarEffList <- CovariateInstance@covarEffList
+    usageType <- covarEffList[[stpName]]
+
+    if (length(usageType) == 0 || usageType == COVAR_EFF_NO) {
+      return(c())
+    }
+
+    ret <- c()
+    covarName <- CovariateInstance@name
+    type <- CovariateInstance@type
     effName <- paste0("d", stpName, "d", covarName)
-    if (type == COVAR_CONTINUOUS) {
-      effName <- paste0("d", stpName, "d", covarName)
-      ret <- c(ret, effName)
-    } else if (type == Category) {
-      sList <- list()
-      items <- attr(c, "covarItems")
-      for (i in 2:length(items)) {
-        item <- items[[i]]
-        val <- attr(item, "value")
-        s <-
-          getCategoryEffectString(usageType, stpName, covarName, val)
-        effName <- paste0("d", stpName, "d", covarName, val)
-        ret <- c(ret, effName)
-      }
-    } else if (type == COVAR_OCCASION) {
 
+    if (type == COVAR_CONTINUOUS) {
+      ret <- effName
+    } else if (type == Category) {
+      items <- CovariateInstance@covarItems
+      for (i in 2:length(items)) {
+        ret <-
+          c(ret, paste0("d", stpName, "d", covarName, items[[i]]@value))
+      }
     }
+
+    ret
   }
-  return(ret)
+
+
+generateCovariateStatement <- function(.Object) {
+  covariates <- .Object@covariateList
+
+  if (length(covariates) == 0) {
+    return(.Object)
+  }
+
+  statements <- .Object@statements
+  for (i in seq_along(covariates)) {
+    covar <- covariates[[i]]
+    name <- covar@name
+    type <- covar@type
+    direction <- covar@direction
+
+    if (direction == COVAR_BACKWARD) {
+      statement <- paste0("    covariate(", name)
+    } else if (direction == COVAR_FORWARD) {
+      statement <- paste0("    fcovariate(", name)
+    } else if (direction == COVAR_INTERPOLATE) {
+      statement <- paste0("    interpolate(", name)
+    }
+
+    if (type == COVAR_CATEGORY) {
+      statement <- paste0(statement, "()")
+    }
+
+    statement <- paste0(statement, ")")
+    statements <- c(statements, statement)
+  }
+
+  .Object@statements <- statements
+
+  .Object
 }
 
-setGeneric(
-  name = "generateCovariateStatement",
-  def = function(.Object) {
-    standardGeneric("generateCovariateStatement")
-  }
-)
 
-setMethod("generateCovariateStatement", "NlmePmlModel",
-  definition = function(.Object) {
-    statements <- .Object@statements
-    covariates <- .Object@covariateList
+generateStparmStatement <- function(.Object) {
+  statements <- .Object@statements
+  structuralParams <- .Object@structuralParams
+  covariateList <- .Object@covariateList
+  # sort the covariates by type: Continuous, Category, Occasion
+  # so the occasion is grouped within random effect
+  CovariateTypes <- sapply(covariateList, function(x)
+    x@type)
+  covariateList <- covariateList[order(CovariateTypes)]
 
-    if (length(covariates) != 0) {
-      for (i in 1:length(covariates)) {
-        covar <- covariates[[i]]
-        name <- attr(covar, "name")
-        type <- attr(covar, "type")
-        direction <- attr(covar, "direction")
-
-        if (direction == COVAR_BACKWARD) {
-          statement <- paste0("    covariate(", name)
-        }
-        if (direction == COVAR_FORWARD) {
-          statement <- paste0("    fcovariate(", name)
-        }
-        if (direction == COVAR_INTERPOLATE) {
-          statement <- paste0("    interpolate(", name)
-        }
-        if (type == COVAR_CATEGORY) {
-          statement <- paste0(statement, "()")
-        }
-        statement <- paste0(statement, ")")
-        statements <- c(statements, statement)
-      }
-    }
-    .Object@statements <- statements
+  if (length(structuralParams) == 0) {
     return(.Object)
   }
-)
 
-#' Returns a new model with  all covariate effects removed
-#'
-#' Returns a new model with  all covariate effects removed
-#'
-#' @param .Object    PK/PD model
-#'
-#' @examples
-#' \donttest{
-#' newModel <- resetCovariateEffects(pkmodel)
-#'
-#' covariateEffect(newModel, "wt", "Cl") <- COVAR_EFF_YES
-#' }
-#' @keywords internal
-#' @noRd
-setGeneric(
-  name = "resetCovariateEffects",
-  def = function(.Object) {
-    standardGeneric("resetCovariateEffects")
-  }
-)
-
-setMethod("resetCovariateEffects", "NlmePmlModel",
-  definition = function(.Object) {
-    statements <- attr(.Object, "statements")
-    covariates <- attr(.Object, "covariateList")
-    if (length(covariates) != 0) {
-      for (i in 1:length(covariates)) {
-        covar <- covariates[[i]]
-        name <- attr(covar, "name")
-        type <- attr(covar, "type")
-        direction <- attr(covar, "direction")
-        covar@covarEffList <- list()
-        covariates[[i]] <- covar
+  for (i in seq_along(structuralParams)) {
+    stp <- structuralParams[[i]]
+    StParmName <- stp@name
+    fixedEffName <- stp@fixedEffName
+    randomEffName <- stp@randomEffName
+    hasRandomEffect <- stp@hasRandomEffect
+    hasCovariateEffect <- stp@hasCovariateEffect
+    style <- stp@style
+    closeParanthesis <- FALSE
+    closeOuterParanthesis <- FALSE
+    if (fixedEffName != "") {
+      if (style == LogNormal) {
+        statement <- paste0(StParmName, " = ", fixedEffName)
+      } else if (style == Normal) {
+        statement <- paste0(StParmName, " = ", fixedEffName)
+      } else if (style == Combination) {
+        statement <- paste0(StParmName, " = (", fixedEffName)
+        closeParanthesis <- TRUE
+      } else if (style == Log) {
+        statement <- paste0(StParmName, " = exp(", fixedEffName)
+        closeOuterParanthesis <- TRUE
+      } else if (style == Logit) {
+        statement <- paste0(StParmName, " = ilogit(", fixedEffName)
+        closeOuterParanthesis <- TRUE
+      } else {
+        stop("unknown structural parameter style")
       }
     }
-    .Object@covariateList <- covariates
-    return(.Object)
-  }
-)
 
-setGeneric(
-  name = "generateStparmSatement",
-  def = function(.Object) {
-    standardGeneric("generateStparmSatement")
-  }
-)
+    # Generate covariate effects
+    randomEffectUsed <- FALSE
+    # JC Removed if ( stp@isFrozen == FALSE && length(covariateList) > 0 )
+    # Replaced with
+    for (indx in seq_along(covariateList)) {
+      CovariateEffects <-
+        generateCovariateEffects(StParmName, covariateList[[indx]], style)
+      if (length(CovariateEffects) == 0)
+        next
+      covarEffList <- covariateList[[indx]]@covarEffList
+      usageType <- covarEffList[[StParmName]]
+      type <- covariateList[[indx]]@type
+      if (type == Occasion && !randomEffectUsed) {
+        randomEffectUsed <- TRUE
 
-setMethod("generateStparmSatement", "NlmePmlModel",
-  definition = function(.Object) {
-    statements <- attr(.Object, "statements")
-    structuralParams <- attr(.Object, "structuralParams")
-    covariateList <- attr(.Object, "covariateList")
-    if (length(structuralParams) > 0) {
-      for (i in 1:length(structuralParams)) {
-        stp <- structuralParams[[i]]
-        name <- attr(stp, "name")
-        fixedEffName <- attr(stp, "fixedEffName")
-        randomEffName <- attr(stp, "randomEffName")
-        hasRandomEffect <- attr(stp, "hasRandomEffect")
-        hasCovariateEffect <- attr(stp, "hasCovariateEffect")
-        style <- attr(stp, "style")
-        closeParanthesis <- FALSE
-        closeOuterParanthesis <- FALSE
-        if (fixedEffName != "") {
-          if (style == LogNormal) {
-            statement <- paste0(name, " = ", fixedEffName)
-          } else if (style == Normal) {
-            statement <- paste0(name, " = ", fixedEffName)
-          } else if (style == Combination) {
-            statement <- paste0(name, " = (", fixedEffName)
-            closeParanthesis <- TRUE
-          } else if (style == Log) {
-            statement <- paste0(name, " = exp(", fixedEffName)
-            closeOuterParanthesis <- TRUE
-          } else if (style == Logit) {
-            statement <- paste0(name, " = ilogit(", fixedEffName)
-            closeOuterParanthesis <- TRUE
-          } else if (style == STP_CUSTOM) {
-
-          }
-        }
-        # Generate covariate effects
-        randomEffectUsed <- FALSE
-        # JC Removed if ( stp@isFrozen == FALSE && length(covariateList) > 0 )
-        if (length(covariateList) > 0) {
-          # Replaced with
-          for (indx in 1:length(covariateList)) {
-            strArray <-
-              generateCovariateEffects(name, covariateList[[indx]], style)
-            if (length(strArray) != 0) {
-              covarEffList <- attr(covariateList[[indx]], "covarEffList")
-              usageType <- covarEffList[[name]]
-              type <- attr(covariateList[[indx]], "type")
-              if (type == Occasion) {
-                if (hasRandomEffect == TRUE) {
-                  randomEffectUsed <- TRUE
-                  if (style == LogNormal ||
-                      style == Combination) {
-                    statement <- paste0(statement, " * exp(", randomEffName)
-                    closeParanthesis <- TRUE
-                  } else {
-                    statement <- paste0(statement, " + ", randomEffName)
-                  }
-                }
-              }
-              for (s in strArray) {
-                if (s != "") {
-                  if (type == Occasion) {
-                    statement <- paste0(statement, " + ", s)
-                  } else {
-                    if (style == LogNormal) {
-                      if (usageType == COVAR_EFF_PLUS_ONE) {
-                        statement <- paste0(statement, " * ( ", s, ") ")
-                      } else {
-                        if (type == Category) {
-                          statement <- paste0(statement, " * exp(", s, ")")
-                        } else {
-                          statement <- paste0(statement, " * ", s, "  ")
-                        }
-                      }
-                    } else if (style == Normal) {
-                      statement <- paste0(statement, " + ", s)
-                    } else if (style == Combination) {
-                      statement <- paste0(statement, " + ", s)
-                    } else if (style == Log) {
-                      statement <- paste0(statement, " + ", s)
-                    } else if (style == Logit) {
-                      statement <- paste0(statement, " + ", s)
-                    } else if (style == Custom) {
-
-                    }
-                  }
-                }
-              }
-              if (type == Occasion &&
-                  closeParanthesis == TRUE) {
-                statement <- paste0(statement, " )")
-                closeParanthesis <- FALSE
-              }
-            }
-          }
-        }
         if (style == Combination) {
-          statement <- paste0(statement, " )")
+          # add `)` at the end of the sum before random block
+          statement <-
+            paste0(statement,
+                   ")")
+          closeParanthesis <- FALSE
         }
 
-        # Generate random effect
-        if (hasRandomEffect == TRUE) {
-          if (randomEffectUsed == FALSE) {
-            ranEffName <- attr(stp, "randomEffName")
-            # if ( ranEffName != "" && stp@isFrozen == FALSE ) { Removed frozen condition below
-            if (ranEffName != "") {
-              style <- attr(stp, "style")
-              if (style == LogNormal) {
-                statement <- paste0(statement, " * exp(", ranEffName, ")")
-              } else if (style == Normal) {
-                statement <- paste0(statement, " + ", ranEffName)
-              } else if (style == Combination) {
-                statement <- paste0(statement, "  * exp(", ranEffName, ")")
-              } else if (style == Log) {
-                statement <- paste0(statement, " + ", ranEffName, ")")
-              } else if (style == Logit) {
-                statement <- paste0(statement, " + ", ranEffName, ")")
-              } else if (style == Custom) {
+        if (style %in% c(LogNormal, Combination)) {
+          statement <-
+            paste0(statement,
+                   " * exp(",
+                   ifelse(hasRandomEffect, randomEffName, ""))
+        } else {
+          statement <-
+            paste0(statement,
+                   " + ",
+                   ifelse(hasRandomEffect, randomEffName, ""))
+        }
+      }
 
-              }
-            } else {
-              if (style == Log || style == Logit) {
-                statement <- paste0(statement, ")")
-              }
-            }
+      CovariateEffects <- CovariateEffects[CovariateEffects != ""]
+      for (CovariateEffect in CovariateEffects) {
+        if (type == Occasion) {
+          # `+` is required
+          # 1. after main ranefname
+          # 2. after first occ eff
+          # 3. if `+` is not already there (after `)` and alphanumeric)
+          PlusRequired <-
+            hasRandomEffect ||
+            CovariateEffect != CovariateEffects[[1]] ||
+            !grepl("[^)a-zA-Z0-9\\s]\\s*$", statement)
+          statement <-
+            paste0(statement,
+                   ifelse(PlusRequired,
+                          " + ",
+                          ""),
+                   CovariateEffect)
+          next
+        }
+
+        if (style == LogNormal) {
+          if (usageType == COVAR_EFF_PLUS_ONE) {
+            statement <- paste0(statement, " * ( ", CovariateEffect, ") ")
+            next
+          }
+
+          # usageType != COVAR_EFF_PLUS_ONE
+          if (type == Category) {
+            statement <- paste0(statement, " * exp(", CovariateEffect, ")")
           } else {
-            if (closeOuterParanthesis == TRUE) {
-              statement <- paste0(statement, " )")
-              closeOuterParanthesis <- FALSE
-            }
+            statement <- paste0(statement, " * ", CovariateEffect, "  ")
           }
-        } else {
-          if (closeOuterParanthesis == TRUE) {
-            statement <- paste0(statement, " )")
-            closeOuterParanthesis <- FALSE
-          }
-        }
 
-        if (style == STP_CUSTOM) {
-          for (c in stp@code) {
-            statement <- c
-            statements <- c(statements, statement)
-          }
+        } else if (style == Normal) {
+          statement <- paste0(statement, " + ", CovariateEffect)
+        } else if (style == Combination) {
+          statement <- paste0(statement, " + ", CovariateEffect)
+        } else if (style == Log) {
+          statement <- paste0(statement, " + ", CovariateEffect)
+        } else if (style == Logit) {
+          statement <- paste0(statement, " + ", CovariateEffect)
         } else {
-          statement <- paste0("    stparm(", statement, ")")
-          structuralParams[[i]]@code <- statement
-          statements <- c(statements, statement)
+          stop("unknown structural parameter style")
         }
       }
     }
 
-    .Object@structuralParams <- structuralParams
-    .Object@statements <- statements
-    return(.Object)
-  }
-)
-
-setGeneric(
-  name = "generateStparmExtraCode",
-  def = function(.Object) {
-    standardGeneric("generateStparmExtraCode")
-  }
-)
-
-setMethod("generateStparmExtraCode", "NlmePmlModel",
-  definition = function(.Object) {
-    statements <- .Object@statements
-    structuralParams <- .Object@structuralParams
-    if (length(structuralParams) > 0) {
-      for (i in 1:length(structuralParams)) {
-        stp <- structuralParams[[i]]
-        name <- stp@name
-        extraCode <- stp@extraCode
-        if (length(extraCode) > 0) {
-          for (l in extraCode) {
-            statements <- c(statements, l)
-          }
-        }
-      }
+    if (closeParanthesis && style == Combination) {
+      # need to close parent of sum if not done yet
+      statement <- paste0(statement, " )")
+      closeParanthesis <- FALSE
     }
-    .Object@statements <- statements
-    return(.Object)
+
+    # Generate random effect if there's no occasion
+    ranEffName <- stp@randomEffName
+    if (hasRandomEffect  && !randomEffectUsed && ranEffName != "") {
+      style <- stp@style
+      if (style == LogNormal) {
+        statement <- paste0(statement, " * exp(", ranEffName, ")")
+      } else if (style == Normal) {
+        statement <- paste0(statement, " + ", ranEffName)
+      } else if (style == Combination) {
+        statement <- paste0(statement, "  * exp(", ranEffName, ")")
+      } else if (style == Log) {
+        statement <- paste0(statement, " + ", ranEffName, ")")
+      } else if (style == Logit) {
+        statement <- paste0(statement, " + ", ranEffName, ")")
+      }
+
+    }
+
+    matches_open <- gregexpr("\\(", statement, fixed = FALSE)
+    matches_close <- gregexpr("\\)", statement, fixed = FALSE)
+
+    # Count: if the first element is -1, no matches were found. Otherwise, count matches.
+    if (matches_open[[1]][1] == -1) {
+      open_count <- 0
+    } else {
+      open_count <- length(matches_open[[1]])
+    }
+
+    if (matches_close[[1]][1] == -1) {
+      close_count <- 0
+    } else {
+      close_count <- length(matches_close[[1]])
+    }
+
+    if (open_count > close_count) {
+      # If the number of open and close parentheses is not equal, add a closing parenthesis
+      statement <-
+        paste0(statement, rep(")", open_count - close_count))
+    } else if (open_count < close_count) {
+      warning("Current stparm() is not correct:\n",
+              statement)
+    }
+
+    statement <- paste0("    stparm(", statement, ")")
+    structuralParams[[i]]@code <- statement
+    statements <- c(statements, statement)
+
   }
-)
+
+  .Object@structuralParams <- structuralParams
+  .Object@statements <- statements
+  .Object
+
+}
+
+generateStparmExtraCode <- function(.Object) {
+  structuralParams <- .Object@structuralParams
+  for (Stparm in structuralParams) {
+    for (extraCode in Stparm@extraCode) {
+      .Object@statements <- c(.Object@statements, extraCode)
+    }
+  }
+
+  .Object
+}
+
 
 actionString <- function(dobefore, doafter) {
   ret <- ""
@@ -3443,7 +3488,9 @@ setGeneric(
   }
 )
 
-setMethod("generateErrorStatment", "NlmePmlModel",
+setMethod(
+  "generateErrorStatment",
+  "NlmePmlModel",
   definition = function(.Object) {
     statements <- attr(.Object, "statements")
     errorModel <- attr(.Object, "errorModel")
@@ -3463,62 +3510,55 @@ setMethod("generateErrorStatment", "NlmePmlModel",
   }
 )
 
-setGeneric(
-  name = "generateEffectsVariables",
-  def = function(.Object) {
-    standardGeneric("generateEffectsVariables")
-  }
-)
 
-setMethod("generateEffectsVariables", "NlmePmlModel",
-  definition = function(.Object) {
-    oldEffects <- .Object@effectsParams
-    effectsParams <- c()
+generateEffectsVariables <- function(.Object) {
+  CovariateEffNames <- getCovariateEffNames(.Object)
+  params <-
+    vector(mode = "list", length = length(CovariateEffNames))
 
-    names <- getCovariateEffNames(.Object)
-
-    params <- vector(mode = "list", length = length(names))
-
-    if (length(names > 0)) {
-      for (i in seq_along(names)) {
-        fixedEffName <- names[[i]]
-        hasRandomEffect <- FALSE
-        style <- STP_PRODUCT
-        initialValue <- "0"
-        lowerBound <- ""
-        upperBound <- ""
-        units <- ""
-        isFrozen <- FALSE
-        isSequential <- FALSE
-
-        params[[i]] <- NlmeStructuralParameter(
-          name = names[[i]],
-          fixedEffName = names[[i]],
-          hasRandomEffect = hasRandomEffect,
-          style = style,
-          initialValue = as.character(initialValue),
-          lowerBound = as.character(lowerBound),
-          upperBound = as.character(upperBound),
-          units = as.character(units),
-          isFrozen = isFrozen,
-          isSequential = isSequential
-        )
-      }
-    }
-
-    for (i in seq_along(params)) {
-      for (j in seq_along(oldEffects)) {
-        if (params[[i]]@name == oldEffects[[j]]@name) {
-          params[[i]] <- oldEffects[[j]]
-        }
-      }
-    }
-
+  if (length(CovariateEffNames) == 0) {
     .Object@effectsParams <- params
-
     return(.Object)
   }
-)
+
+  for (i in seq_along(CovariateEffNames)) {
+    fixedEffName <- CovariateEffNames[[i]]
+    hasRandomEffect <- FALSE
+    style <- STP_PRODUCT
+    initialValue <- "0"
+    lowerBound <- ""
+    upperBound <- ""
+    units <- ""
+    isFrozen <- FALSE
+    isSequential <- FALSE
+
+    params[[i]] <- NlmeStructuralParameter(
+      name = CovariateEffNames[[i]],
+      fixedEffName = CovariateEffNames[[i]],
+      hasRandomEffect = hasRandomEffect,
+      style = style,
+      initialValue = as.character(initialValue),
+      lowerBound = as.character(lowerBound),
+      upperBound = as.character(upperBound),
+      units = as.character(units),
+      isFrozen = isFrozen,
+      isSequential = isSequential
+    )
+  }
+
+  oldEffects <- .Object@effectsParams
+  for (i in seq_along(params)) {
+    for (j in seq_along(oldEffects)) {
+      if (params[[i]]@name == oldEffects[[j]]@name) {
+        params[[i]] <- oldEffects[[j]]
+      }
+    }
+  }
+
+  .Object@effectsParams <- params
+
+  .Object
+}
 
 #' Lists covariate effect names in the model
 #'
@@ -3529,6 +3569,22 @@ setMethod("generateEffectsVariables", "NlmePmlModel",
 #'
 #' @examples
 #' \donttest{
+#' model <- pkmodel(
+#'   numCompartments = 2,
+#'   data = pkData,
+#'   ID = "Subject",
+#'   Time = "Act_Time",
+#'   A1 = "Amount",
+#'   CObs = "Conc",
+#'   workingDir = tempdir()
+#' )
+#' model <- addCovariate(model,
+#'   covariate = "Gender",
+#'   type = "Categorical",
+#'   effect = c("V2", "Cl2"),
+#'   levels = c(0, 1),
+#'   labels = c("Female", "Male")
+#' )
 #' listCovariateEffectNames(model)
 #' }
 #' @return A vector of character strings containing the names
@@ -3545,7 +3601,9 @@ setGeneric(
 
 #' @rdname listCovariateEffectNames
 #' @aliases listCovariateEffectNames,NlmePmlModel-method
-setMethod("listCovariateEffectNames", "NlmePmlModel",
+setMethod(
+  "listCovariateEffectNames",
+  "NlmePmlModel",
   definition = function(.Object) {
     if (!.Object@isTextual) {
       CovariateEffectNames <-
@@ -3570,278 +3628,270 @@ setMethod("listCovariateEffectNames", "NlmePmlModel",
   }
 )
 
-setGeneric(
-  name = "generateFixedEffStatment",
-  def = function(.Object) {
-    standardGeneric("generateFixedEffStatment")
-  }
-)
-
-setMethod("generateFixedEffStatment", "NlmePmlModel",
-  definition = function(.Object) {
-    statements <- .Object@statements
-    structuralParams <- .Object@structuralParams
-    effectsParams <- .Object@effectsParams
-    frozenList <- c()
-    if (length(structuralParams) > 0) {
-      for (i in 1:length(structuralParams)) {
-        stp <- structuralParams[[i]]
-        name <- stp@name
-        fixedEffName <- stp@fixedEffName
-        randomEffName <- stp@randomEffName
-        initialValue <- stp@initialValue
-        lowerBound <- stp@lowerBound
-        upperBound <- stp@upperBound
-        isFrozen <- stp@isFrozen
-        isSequential <- stp@isSequential
-        if (fixedEffName != "") {
-          if (isFrozen || isSequential) {
-            freezeStatement <- "(freeze)"
-            frozenList <- c(frozenList, randomEffName)
-          } else {
-            freezeStatement <- ""
-          }
-          statement <- paste0(
-            "    fixef( ",
-            fixedEffName,
-            freezeStatement,
-            " = c(",
-            lowerBound,
-            ",",
-            initialValue,
-            ",",
-            upperBound,
-            "))"
-          )
+generateFixedEffStatment <- function(.Object) {
+  statements <- .Object@statements
+  structuralParams <- .Object@structuralParams
+  effectsParams <- .Object@effectsParams
+  frozenList <- c()
+  if (length(structuralParams) > 0) {
+    for (i in 1:length(structuralParams)) {
+      stp <- structuralParams[[i]]
+      name <- stp@name
+      fixedEffName <- stp@fixedEffName
+      randomEffName <- stp@randomEffName
+      initialValue <- stp@initialValue
+      lowerBound <- stp@lowerBound
+      upperBound <- stp@upperBound
+      isFrozen <- stp@isFrozen
+      isSequential <- stp@isSequential
+      if (fixedEffName != "") {
+        if (isFrozen || isSequential) {
+          freezeStatement <- "(freeze)"
+          frozenList <- c(frozenList, randomEffName)
+        } else {
+          freezeStatement <- ""
         }
-        statements <- c(statements, statement)
+        statement <- paste0(
+          "    fixef( ",
+          fixedEffName,
+          freezeStatement,
+          " = c(",
+          lowerBound,
+          ",",
+          initialValue,
+          ",",
+          upperBound,
+          "))"
+        )
       }
+      statements <- c(statements, statement)
     }
-    directions <- getCovariateEffDirection(.Object)
-    if (length(effectsParams) > 0) {
-      for (i in 1:length(effectsParams)) {
-        stp <- effectsParams[[i]]
-        name <- stp@name
-        fixedEffName <- stp@fixedEffName
-        initialValue <- stp@initialValue
-        lowerBound <- stp@lowerBound
-        upperBound <- stp@upperBound
-        isFrozen <- stp@isFrozen
-        isSequential <- stp@isSequential
-
-        if (fixedEffName != "") {
-          if (isFrozen || isSequential) {
-            statement <-
-              paste0(
-                "    fixef( ",
-                fixedEffName,
-                "(freeze) = c(",
-                lowerBound,
-                ",",
-                initialValue,
-                ",",
-                upperBound,
-                "))"
-              )
-          } else {
-            statement <-
-              paste0(
-                "    fixef( ",
-                fixedEffName,
-                "(enable=c(",
-                directions[i],
-                ")) = c(",
-                lowerBound,
-                ",",
-                initialValue,
-                ",",
-                upperBound,
-                "))"
-              )
-          }
-        }
-        statements <- c(statements, statement)
-      }
-    }
-
-    .Object@statements <- statements
-    return(.Object)
   }
-)
+  directions <- getCovariateEffDirection(.Object)
+  if (length(effectsParams) > 0) {
+    for (i in 1:length(effectsParams)) {
+      stp <- effectsParams[[i]]
+      name <- stp@name
+      fixedEffName <- stp@fixedEffName
+      initialValue <- stp@initialValue
+      lowerBound <- stp@lowerBound
+      upperBound <- stp@upperBound
+      isFrozen <- stp@isFrozen
+      isSequential <- stp@isSequential
 
-#'
-#'
-setGeneric(
-  name = "generateSecondaryStatement",
-  def = function(.Object) {
-    standardGeneric("generateSecondaryStatement")
-  }
-)
-
-setMethod("generateSecondaryStatement", "NlmePmlModel",
-  definition = function(.Object) {
-    statements <- attr(.Object, "statements")
-    secondary <- attr(.Object, "secondaryParameters")
-    for (s in secondary) {
-      line <- paste0("    secondary(", s@name, "=", s@definition, ")")
-      statements <- c(statements, line)
-    }
-
-    .Object@statements <- statements
-    return(.Object)
-  }
-)
-
-
-#'
-#'
-setGeneric(
-  name = "generateRanEffStatment",
-  def = function(.Object) {
-    standardGeneric("generateRanEffStatment")
-  }
-)
-
-setMethod("generateRanEffStatment", "NlmePmlModel",
-  definition = function(.Object) {
-    statements <- attr(.Object, "statements")
-    structuralParams <- attr(.Object, "structuralParams")
-
-    randomEffectsStatements <- .Object@randomEffectsStatements
-    covariateStatement <- ""
-
-    if (.Object@randomValuesInitialized == FALSE) {
-      .Object <- initializeRandomEffectsBlock(.Object)
-    }
-
-    if (length(randomEffectsStatements) > 0) {
-      statements <- c(statements, randomEffectsStatements)
-    } else {
-      if (length(structuralParams) > 0) {
-        first <- TRUE
-        firstCovariate <- TRUE
-        effectStatement <- ""
-        effectInitialValues <- ""
-        for (i in 1:length(structuralParams)) {
-          stp <- structuralParams[[i]]
-          name <- attr(stp, "name")
-          fixedEffName <- attr(stp, "fixedEffName")
-          randomEffName <- attr(stp, "randomEffName")
-          initialValue <- attr(stp, "initialValue")
-          ranEffInitValue <- attr(stp, "ranEffInitValue")
-          lowerBound <- attr(stp, "lowerBound")
-          upperBound <- attr(stp, "upperBound")
-          hasRandomEffect <- attr(stp, "hasRandomEffect")
-          isFrozen <- attr(stp, "isFrozen")
-          isSequential <- attr(stp, "isSequential")
-          # if ( randomEffName != "" && hasRandomEffect &&(isFrozen == FALSE) && ( isSequential == FALSE ) ){
-          if (randomEffName != "" &&
-              hasRandomEffect && isSequential == FALSE) {
-            if (first == TRUE) {
-              effectStatement <- "    ranef(diag("
-              effectInitialValues <- " c("
-              first <- FALSE
-            } else {
-              effectStatement <- paste0(effectStatement, ",")
-              effectInitialValues <-
-                paste0(effectInitialValues, ",")
-            }
-            effectStatement <-
-              paste0(effectStatement, randomEffName)
-            effectInitialValues <-
-              paste0(effectInitialValues, ranEffInitValue)
-            #                    effectInitialValues=paste0(effectInitialValues,"1")
-          }
-          # if ( randomEffName != "" && hasRandomEffect &&(isFrozen == FALSE) && ( isSequential == TRUE ) ){
-          if (randomEffName != "" &&
-              hasRandomEffect && isSequential == TRUE) {
-            if (firstCovariate == TRUE) {
-              covariateStatement <- randomEffName
-              firstCovariate <- FALSE
-            } else {
-              covariateStatement <- paste0(covariateStatement, ",", randomEffName)
-            }
-          }
-        }
-        if (covariateStatement != "") {
-          covariateStatement <-
-            paste0("    covariate(", covariateStatement, ")")
-          statements <- c(statements, covariateStatement)
-        }
-        if (effectStatement != "") {
-          # if ( effectStatement != "" && hasRandomEffect) {
+      if (fixedEffName != "") {
+        if (isFrozen || isSequential) {
           statement <-
-            paste0(effectStatement, ") = ", effectInitialValues, "))")
-          statements <- c(statements, statement)
+            paste0(
+              "    fixef( ",
+              fixedEffName,
+              "(freeze) = c(",
+              lowerBound,
+              ",",
+              initialValue,
+              ",",
+              upperBound,
+              "))"
+            )
+        } else {
+          statement <-
+            paste0(
+              "    fixef( ",
+              fixedEffName,
+              "(enable=c(",
+              directions[i],
+              ")) = c(",
+              lowerBound,
+              ",",
+              initialValue,
+              ",",
+              upperBound,
+              "))"
+            )
         }
       }
-    } # closes control flow from above problemetic TRUE statement
+      statements <- c(statements, statement)
+    }
+  }
 
-    # Generate occasion covariate effect's random effect
-    if (length(.Object@randomOccasionalEffectsStatements) > 0) {
-      statements <-
-        c(statements, .Object@randomOccasionalEffectsStatements)
-    } else {
-      covariates <- .Object@covariateList
-      variables <- c()
-      for (c in covariates) {
-        if (c@type == Occasion) {
-          items <- c@covarItems
-          effects <- c@covarEffList
-          isEnabled <-
-            effects == 1 # Added to generate ran eff statement for only effects that are enabled
-          values <- c@catEffInitValues
-          effects <- effects[isEnabled]
-          values <- values[isEnabled]
-          names <- names(effects)
-          if (length(effects) > 0) {
-            for (indx in 1:length(names)) {
-              value <- values[[indx]]
-              name <-
-                paste0("n", names[[indx]], "x", items[[1]]@value)
-              variables <- c(variables, name)
-            }
-            if (length(variables) == length(values)) {
-              statement <- paste0(
-                "    ranef(diag(",
-                paste(as.character(variables), collapse = ","),
-                ") = c(",
-                paste(as.character(values), collapse = ","),
-                ")"
-              )
-            } else {
-              statement <- paste0(
-                "    ranef(block(",
-                paste(as.character(variables), collapse = ","),
-                ") = c(",
-                paste(as.character(values), collapse = ","),
-                ")"
-              )
-            }
-            if (length(items) > 1) {
-              for (i in 2:length(items)) {
-                variables <- c()
-                for (indx in 1:length(names)) {
-                  name <- paste0("n", names[[indx]], "x", items[[i]]@value)
-                  variables <- c(variables, name)
-                }
-                statement <- paste0(statement,
-                                    ", same(",
-                                    paste(as.character(variables), collapse = ","),
-                                    ")")
-              }
-            }
-            statement <- paste0(statement, ")")
-            statements <- c(statements, statement)
-          }
+  .Object@statements <- statements
+
+  .Object
+}
+
+#'
+generateSecondaryStatement <- function(.Object) {
+  secondaryParameters <- .Object@secondaryParameters
+  for (secondaryParameter in secondaryParameters) {
+    .Object@statements <- c(
+      .Object@statements,
+      paste0(
+        "    secondary(",
+        secondaryParameter@name,
+        "=",
+        secondaryParameter@definition,
+        ")"
+      )
+    )
+  }
+
+  .Object
+}
+
+generateRanEffStatment <- function(.Object) {
+  statements <- .Object@statements
+  structuralParams <- .Object@structuralParams
+
+  randomEffectsStatements <- .Object@randomEffectsStatements
+  covariateStatement <- ""
+
+  if (!.Object@randomValuesInitialized) {
+    .Object <- initializeRandomEffectsBlock(.Object)
+  }
+
+  if (length(randomEffectsStatements) > 0) {
+    statements <- c(statements, randomEffectsStatements)
+  } else if (length(structuralParams) > 0) {
+    first <- TRUE
+    firstCovariate <- TRUE
+    effectStatement <- ""
+    effectInitialValues <- ""
+    for (i in seq_along(structuralParams)) {
+      stp <- structuralParams[[i]]
+      name <- stp@name
+      randomEffName <- stp@randomEffName
+      ranEffInitValue <- stp@ranEffInitValue
+      hasRandomEffect <- stp@hasRandomEffect
+      isSequential <- stp@isSequential
+      # if ( randomEffName != "" && hasRandomEffect &&(isFrozen == FALSE) && ( isSequential == FALSE ) ){
+      if (randomEffName != "" &&
+          hasRandomEffect && !isSequential) {
+        if (first) {
+          effectStatement <- "    ranef(diag("
+          effectInitialValues <- " c("
+          first <- FALSE
+        } else {
+          effectStatement <- paste0(effectStatement, ",")
+          effectInitialValues <-
+            paste0(effectInitialValues, ",")
+        }
+
+        effectStatement <-
+          paste0(effectStatement, randomEffName)
+        effectInitialValues <-
+          paste0(effectInitialValues, ranEffInitValue)
+        #                    effectInitialValues=paste0(effectInitialValues,"1")
+      }
+      # if ( randomEffName != "" && hasRandomEffect &&(isFrozen == FALSE) && ( isSequential == TRUE ) ){
+      if (randomEffName != "" &&
+          hasRandomEffect && isSequential) {
+        if (firstCovariate) {
+          covariateStatement <- randomEffName
+          firstCovariate <- FALSE
+        } else {
+          covariateStatement <- paste0(covariateStatement, ",", randomEffName)
         }
       }
     }
 
-    .Object@statements <- statements
-    return(.Object)
+    if (covariateStatement != "") {
+      covariateStatement <-
+        paste0("    covariate(", covariateStatement, ")")
+      statements <- c(statements, covariateStatement)
+    }
+
+    if (effectStatement != "") {
+      # if ( effectStatement != "" && hasRandomEffect) {
+      statement <-
+        paste0(effectStatement, ") = ", effectInitialValues, "))")
+      statements <- c(statements, statement)
+    }
+  } # closes control flow from above problematic TRUE statement
+
+  # Generate occasion covariate effect's random effect
+  if (length(.Object@randomOccasionalEffectsStatements) > 0) {
+    statements <-
+      c(statements, .Object@randomOccasionalEffectsStatements)
+  } else {
+    covariates <- .Object@covariateList
+    for (CovariateInstance in covariates) {
+      if (CovariateInstance@type != Occasion)
+        next
+
+      RanefNames <- c()
+      items <- CovariateInstance@covarItems
+      effects <- CovariateInstance@covarEffList
+      isEnabled <-
+        effects == 1 # Added to generate ran eff statement for only effects that are enabled
+      effects <- effects[isEnabled]
+      if (length(effects) == 0)
+        next
+
+      values <- CovariateInstance@catEffInitValues[isEnabled]
+      AffectedStParmNames <- names(effects)
+
+      for (indx in seq_along(AffectedStParmNames)) {
+        RanefNames <- c(
+          RanefNames,
+          paste0(
+            "n",
+            AffectedStParmNames[[indx]],
+            "x",
+            CovariateInstance@name,
+            items[[1]]@value
+          )
+        )
+      }
+
+      if (length(RanefNames) == length(values)) {
+        statement <- paste0(
+          "    ranef(diag(",
+          paste(as.character(RanefNames), collapse = ","),
+          ") = c(",
+          paste(as.character(values), collapse = ","),
+          ")"
+        )
+      } else {
+        statement <- paste0(
+          "    ranef(block(",
+          paste(as.character(RanefNames), collapse = ","),
+          ") = c(",
+          paste(as.character(values), collapse = ","),
+          ")"
+        )
+      }
+
+      if (length(items) > 1) {
+        for (i in 2:length(items)) {
+          RanefNames <- c()
+          for (indx in seq_along(AffectedStParmNames)) {
+            RanefNames <- c(
+              RanefNames,
+              paste0(
+                "n",
+                AffectedStParmNames[[indx]],
+                "x",
+                CovariateInstance@name,
+                items[[i]]@value
+              )
+            )
+          }
+
+          statement <- paste0(statement,
+                              ", same(",
+                              paste(as.character(RanefNames), collapse = ","),
+                              ")")
+        }
+      }
+
+      statement <- paste0(statement, ")")
+      statements <- c(statements, statement)
+    }
   }
-)
+
+  .Object@statements <- statements
+  return(.Object)
+}
 
 
 #' Generates PML statements based on the current model
@@ -3850,7 +3900,7 @@ setMethod("generateRanEffStatment", "NlmePmlModel",
 #'
 #' @param .Object PK/PD model
 #' @keywords internal
-
+#' @noRd
 setGeneric(
   name = "generatePMLModel",
   def = function(.Object) {
@@ -3858,10 +3908,12 @@ setGeneric(
   }
 )
 
-setMethod("generatePMLModel", "NlmePmlModel",
+setMethod(
+  "generatePMLModel",
+  "NlmePmlModel",
   definition = function(.Object) {
     modelStatements(.Object) <- list()
-    modelType <- attr(attr(.Object, "modelType"), "modelType")
+    modelType <- .Object@modelType@modelType
     paramType <- .Object@pkModelAttrs@parameterization@paramType
     frozen <- FALSE
     .Object@dosePoints <- list()
@@ -3906,225 +3958,205 @@ setMethod("generatePMLModel", "NlmePmlModel",
       .Object <- generateEffectsModel(.Object, scInput, frozen)
     }
 
+    # note that it does not generate occasion effects:
     .Object <- generateEffectsVariables(.Object)
+
     .Object <- generateErrorStatment(.Object)
-    .Object <- generateStparmSatement(.Object)
+    .Object <- generateStparmStatement(.Object)
     .Object <- generateCovariateStatement(.Object)
     .Object <- generateStparmExtraCode(.Object)
     .Object <- generateFixedEffStatment(.Object)
     .Object <- generateRanEffStatment(.Object)
     .Object <- generateSecondaryStatement(.Object)
-    statements <- attr(.Object, "statements")
+    statements <- .Object@statements
     if (length(statements) == 0) {
       statements <- c(statements, "test(){")
     }
     statements <- c(statements, "}")
     .Object@statements <- statements
-    return(.Object)
+
+    .Object
   }
 )
 
-
-setGeneric(
-  name = "generateIndirectModel",
-  def = function(.Object, scInput) {
-    standardGeneric("generateIndirectModel")
+generateIndirectModel <- function(.Object, scInput) {
+  statements <- .Object@statements
+  if (length(statements) == 0) {
+    statements <- c(statements, "test(){")
   }
-)
 
-setMethod("generateIndirectModel", "NlmePmlModel",
-  definition = function(.Object, scInput) {
-    statements <- attr(.Object, "statements")
-    if (length(statements) == 0) {
-      statements <- c(statements, "test(){")
+  structuralParams <- attr(.Object, "structuralParams")
+  dosePoints <- attr(.Object, "dosePoints")
+  outputParams <- attr(.Object, "outputParams")
+  diffEquations <- attr(.Object, "diffEquations")
+  attrs <- attr(.Object, "indirectModelAttrs")
+
+  type <- attrs@type
+  hasEffectsCompartment <- attrs@hasEffectsCompartment
+  isBuildup <- attrs@isBuildup
+  isExponent <- attrs@isExponent
+  frozen <- attrs@frozen
+
+
+  sC <- scInput
+  sMax <- ""
+  s50 <- ""
+
+  if (type == LIMITED_STIM) {
+    sMax <- "Emax"
+    s50 <- "EC50"
+    if (isExponent) {
+      s50 <- paste0(s50, " ^gam ")
+      sC <- paste0(sC, " ^gam ")
     }
-
-    structuralParams <- attr(.Object, "structuralParams")
-    dosePoints <- attr(.Object, "dosePoints")
-    outputParams <- attr(.Object, "outputParams")
-    diffEquations <- attr(.Object, "diffEquations")
-    attrs <- attr(.Object, "indirectModelAttrs")
-
-    type <- attrs@type
-    hasEffectsCompartment <- attrs@hasEffectsCompartment
-    isBuildup <- attrs@isBuildup
-    isExponent <- attrs@isExponent
-    frozen <- attrs@frozen
-
-
-    sC <- scInput
+    sFrac <- paste0(sC, " / (", sC, " + ", s50, ")")
+    statement <- paste0(sMax, " * ", sFrac)
+    statement <- paste0("(1 + ", statement, ")")
+  }
+  if (type == INFINITE_STIM) {
     sMax <- ""
-    s50 <- ""
+    s50 <- "EC50"
+    sFrac <- paste0("(", sC, " / ", s50, ")")
+    if (isExponent) {
+      sFrac <- paste0(sFrac, " ^ gam")
+    }
+    statement <- sFrac
+    statement <- paste0("(1 + ", statement, ")")
+  }
+  if (type == LIMITED_INHIB) {
+    sMax <- "Imax"
+    s50 <- "IC50"
+    if (isExponent) {
+      s50 <- paste0(s50, " ^ gam")
+      sC <- paste0(sC, " ^ gam")
+    }
+    sFrac <- paste0(sC, " / (", sC, " + ", s50, ")")
+    statement <- paste0(sMax, " * ", sFrac)
+    statement <- paste0("(1 - ", statement, ")")
+  }
+  if (type == INVERSE_INHIB) {
+    sMax <- "Imax"
+    s50 <- "IC50"
+    if (isExponent) {
+      s50 <- paste0(s50, " ^ gam")
+      sC <- paste0(sC, " ^ gam")
+    }
+    sFrac <- paste0(sC, " / (", sC, " + ", s50, ")")
+    statement <- paste0(sMax, " * ", sFrac)
+    statement <- paste0("1 / (1 + ", statement, ")")
+  }
+  if (type == LINEAR_STIM) {
+    sS <- "s"
+    if (isExponent) {
+      sC <- paste0(sC, " ^ gam")
+    }
+    statement <- paste0("(1 +  ", sS, " * ", sC, ")")
+  }
+  if (type == LOG_LINEAR_STIM) {
+    sS <- "s"
+    if (isExponent) {
+      sC <- paste0(sC, " ^ gam")
+    }
+    statement <- paste0("(1 + log(1 + ", sS, " * ", sC, "))")
+  }
+  if (isBuildup == TRUE) {
+    sIn <- paste0("Kin * ", statement)
+    sOut <- "Kout"
+  } else {
+    sIn <- "Kin"
+    sOut <- paste0("Kout * ", statement)
+  }
+  deriv <- paste0("    deriv(E = ", sIn, " - ", sOut, " * E)")
+  diffEquations <- c(diffEquations, deriv)
+  statements <- c(statements, deriv)
+  statement <- "    sequence{ E= Kin / Kout}"
+  statements <- c(statements, statement)
 
-    if (type == LIMITED_STIM) {
-      sMax <- "Emax"
-      s50 <- "EC50"
-      if (isExponent) {
-        s50 <- paste0(s50, " ^gam ")
-        sC <- paste0(sC, " ^gam ")
+  .Object@statements <- statements
+  .Object@diffEquations <- diffEquations
+  .Object@outputParams <- outputParams
+  .Object
+}
+
+
+# adds covariate instance to the model
+# for this covariate, the function will
+# concatenate the existed covEffList with all stparms associated with covariates
+associateCovarsWithParams <- function(model, CovClassInstance) {
+  if (length(CovClassInstance) == 0) {
+    return(model)
+  }
+
+  covEffList <- CovClassInstance@covarEffList
+  covariateType <- CovClassInstance@type
+  StParmNames <- c()
+  for (StParm in model@structuralParams) {
+    # not clear why if the structural parameter is frozen, it should not be associated with a covariate
+    if (StParm@hasCovariateEffect == TRUE &&
+        StParm@isFrozen == FALSE) {
+      StParmNames <- c(StParmNames, StParm@name)
+      if (covariateType == COVAR_CONTINUOUS) {
+        covEffList <- c(covEffList, name = COVAR_EFF_PLUS_ONE)
+      } else {
+        covEffList <- c(covEffList, name = COVAR_EFF_YES)
       }
-      sFrac <- paste0(sC, " / (", sC, " + ", s50, ")")
-      statement <- paste0(sMax, " * ", sFrac)
-      statement <- paste0("(1 + ", statement, ")")
     }
-    if (type == INFINITE_STIM) {
-      sMax <- ""
-      s50 <- "EC50"
-      sFrac <- paste0("(", sC, " / ", s50, ")")
-      if (isExponent) {
-        sFrac <- paste0(sFrac, " ^ gam")
-      }
-      statement <- sFrac
-      statement <- paste0("(1 + ", statement, ")")
-    }
-    if (type == LIMITED_INHIB) {
-      sMax <- "Imax"
-      s50 <- "IC50"
-      if (isExponent) {
-        s50 <- paste0(s50, " ^ gam")
-        sC <- paste0(sC, " ^ gam")
-      }
-      sFrac <- paste0(sC, " / (", sC, " + ", s50, ")")
-      statement <- paste0(sMax, " * ", sFrac)
-      statement <- paste0("(1 - ", statement, ")")
-    }
-    if (type == INVERSE_INHIB) {
-      sMax <- "Imax"
-      s50 <- "IC50"
-      if (isExponent) {
-        s50 <- paste0(s50, " ^ gam")
-        sC <- paste0(sC, " ^ gam")
-      }
-      sFrac <- paste0(sC, " / (", sC, " + ", s50, ")")
-      statement <- paste0(sMax, " * ", sFrac)
-      statement <- paste0("1 / (1 + ", statement, ")")
-    }
-    if (type == LINEAR_STIM) {
-      sS <- "s"
-      if (isExponent) {
-        sC <- paste0(sC, " ^ gam")
-      }
-      statement <- paste0("(1 +  ", sS, " * ", sC, ")")
-    }
-    if (type == LOG_LINEAR_STIM) {
-      sS <- "s"
-      if (isExponent) {
-        sC <- paste0(sC, " ^ gam")
-      }
-      statement <- paste0("(1 + log(1 + ", sS, " * ", sC, "))")
-    }
-    if (isBuildup == TRUE) {
-      sIn <- paste0("Kin * ", statement)
-      sOut <- "Kout"
+  }
+
+  names(covEffList) <- StParmNames
+  CovClassInstance@covarEffList <- covEffList
+
+  model@covariateList <- c(model@covariateList, CovClassInstance)
+
+  model
+}
+
+addCovariates <- function(model, NewCovariateInstance, effects) {
+  # add covariates to the model (covariateList)
+  # update covEffList for each covariate
+  model <- associateCovarsWithParams(model, NewCovariateInstance)
+  if (length(effects) == 0) {
+    # model <- generatePMLModel(model)
+    return(model)
+  }
+
+  # effects is a vector of covariates
+  # names(effects) is a vector of affected structural parameters
+  for (AffectedStParmName in names(effects)) {
+    CovName <- effects[AffectedStParmName]
+    if (NewCovariateInstance@name != CovName)
+      next
+
+    if (NewCovariateInstance@type == Continuous &&
+        !NewCovariateInstance@isPositive) {
+      covariateEffect(model, CovName, AffectedStParmName) <-
+        COVAR_EFF_PLUS_ONE
     } else {
-      sIn <- "Kin"
-      sOut <- paste0("Kout * ", statement)
+      covariateEffect(model, CovName, AffectedStParmName) <- COVAR_EFF_YES
     }
-    deriv <- paste0("    deriv(E = ", sIn, " - ", sOut, " * E)")
-    diffEquations <- c(diffEquations, deriv)
-    statements <- c(statements, deriv)
-    statement <- "    sequence{ E= Kin / Kout}"
-    statements <- c(statements, statement)
-
-    .Object@statements <- statements
-    .Object@diffEquations <- diffEquations
-    .Object@outputParams <- outputParams
-    return(.Object)
   }
-)
 
+  covariateList <- model@covariateList
+  for (CovariateInstanceIndex in seq_along(covariateList)) {
+    CovariateInstance <- covariateList[[CovariateInstanceIndex]]
 
-#'
-#'
-setGeneric(
-  name = "associateCovarsWithParams",
-  def = function(model, covariates) {
-    standardGeneric("associateCovarsWithParams")
-  }
-)
+    if (CovariateInstance@type != Occasion)
+      next
 
-setMethod("associateCovarsWithParams", "NlmePmlModel",
-  definition = function(model, covariates) {
-    structuralParams <- model@structuralParams
-
-    if (length(covariates) != 0) {
-      for (indx in 1:length(covariates)) {
-        c <- covariates[[indx]]
-        covEffList <- c@covarEffList
-        covariateType <- c@type
-        names <- c()
-        for (s in structuralParams) {
-          if (attr(s, "hasCovariateEffect") == TRUE && s@isFrozen == FALSE) {
-            name <- s@name
-            names <- c(names, name)
-            if (covariateType == COVAR_CONTINUOUS) {
-              covEffList <- c(covEffList, name = COVAR_EFF_PLUS_ONE)
-            } else {
-              covEffList <- c(covEffList, name = COVAR_EFF_YES)
-            }
-          }
-        }
-        names(covEffList) <- names
-        c@covarEffList <- covEffList
-        covariates[[indx]] <- c
-      }
+    num <- length(CovariateInstance@covarEffList)
+    if (length(CovariateInstance@catEffInitValues) == 0) {
+      CovariateInstance@catEffInitValues <- as.list(rep(1, num))
     }
-    cov <- model@covariateList
-    covariates <- c(cov, covariates)
-    model@covariateList <- covariates
-    return(model)
-  }
-)
 
-setGeneric(
-  name = "addCovariates",
-  def = function(model, covariates, effects) {
-    standardGeneric("addCovariates")
+    covariateList[[CovariateInstanceIndex]] <- CovariateInstance
   }
-)
 
-setMethod("addCovariates", "NlmePmlModel",
-  definition = function(model, covariates, effects) {
-    model <- associateCovarsWithParams(model, covariates)
+  model@covariateList <- covariateList
 
-    if (length(effects) != 0) {
-      names <- names(effects)
-      for (n in names) {
-        covars <- effects[n]
-        for (c in unlist(strsplit(covars, split = ","))) {
-          c <- trimws(c, "both")
-          isPositive <- FALSE
-          type <- CovarNumber
-          for (covar in covariates) {
-            if (covar@name == c) {
-              isPositive <- covar@isPositive
-              type <- covar@type
-            }
-          }
-          if (type == Continuous && isPositive == FALSE) {
-            covariateEffect(model, c, n) <- COVAR_EFF_PLUS_ONE
-          } else {
-            covariateEffect(model, c, n) <- COVAR_EFF_YES
-          }
-        }
-      }
-      covariateList <- model@covariateList
-      for (indx in 1:length(covariateList)) {
-        c <- covariateList[[indx]]
-        if (c@type == Occasion) {
-          num <- length(c@covarEffList)
-          if (length(c@catEffInitValues) == 0) {
-            c@catEffInitValues <- as.list(rep(1, num))
-          }
-          covariateList[[indx]] <- c
-        }
-      }
-      model@covariateList <- covariateList
-    }
-    model <- generatePMLModel(model)
-    return(model)
-  }
-)
+  #generatePMLModel(model)
+  model
+}
+
 
 .get_fixefStrings <- function(model, initialcf) {
   if (missing(initialcf)) {
@@ -4153,7 +4185,8 @@ setMethod("addCovariates", "NlmePmlModel",
 #'   Time = "Act_Time",
 #'   A1 = "Amount",
 #'   CObs = "Conc",
-#'   modelName = "TwCpt_IVBolus_FOCE_ELS"
+#'   modelName = "TwCpt_IVBolus_FOCE_ELS",
+#'   workingDir = tempdir()
 #'   )
 #'
 #' # View initial/current fixed effect values
@@ -4174,7 +4207,9 @@ setGeneric(
 
 #' @export
 #' @rdname initFixedEffects
-setMethod("initFixedEffects", "NlmePmlModel",
+setMethod(
+  "initFixedEffects",
+  "NlmePmlModel",
   definition = function(.Object) {
     if (.Object@isTextual) {
       estimates <- getThetas(.Object)
@@ -4224,7 +4259,9 @@ setGeneric(
 
 #' @export
 #' @rdname initFixedEffects
-setMethod("initFixedEffects<-", "NlmePmlModel",
+setMethod(
+  "initFixedEffects<-",
+  "NlmePmlModel",
   definition = function(.Object, value) {
     if (.Object@isTextual) {
       statements <- .update_PMLwithThetas(.Object, value)
@@ -4303,7 +4340,9 @@ setGeneric(
   }
 )
 
-setMethod("generatePML", "NlmePmlModel",
+setMethod(
+  "generatePML",
+  "NlmePmlModel",
   definition = function(.Object) {
     if (.Object@isTextual == FALSE) {
       .Object <- generatePMLModel(.Object)
@@ -4351,7 +4390,9 @@ setGeneric(
 #' @return Returns the 'NlmePmlModel' object with updated reset information and definitions.
 #'
 #' @export
-setMethod("addReset", "NlmePmlModel",
+setMethod(
+  "addReset",
+  "NlmePmlModel",
   definition = function(.Object,
                         low,
                         hi,

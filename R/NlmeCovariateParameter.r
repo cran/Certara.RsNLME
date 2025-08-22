@@ -366,22 +366,34 @@ occasionCovariate <- function(name = "",
 #'   denotes the name of the covariate, and `"BodyWeight"` is the name of the
 #'   corresponding column in the input dataset.
 #' @param effect       Name of structural parameter(s) on which the covariate
-#'   has an effect.  Specify `effect` as character or character vector if the
+#'   has an effect. Specify `effect` as character or character vector if the
 #'   covariate has an effect on multiple structural parameters.
+#'   **Important for Occasion Covariates:** When modifying an *existing*
+#'   occasion covariate (e.g., changing `option` or `values`), you must
+#'    list *all* structural parameters currently affected by this occasion
+#'    covariate in the `effect` argument, even those whose effect relationship
+#'    is not being changed in this specific call.
 #' @param type         Type of covariate. Options are `"Continuous"`,
 #'   `"Categorical"`, `"Occasion"`.
 #' @param direction Direction of missing values propagation (if no covariate
 #'   value is given). Options are `"Forward"`, `"Interpolate"`, `"Backward"`,
 #'   where `"Interpolate"` is only applicable to `type = "Continuous"`.
-#' @param option Options are `"Yes"`, `"PlusOne"`, or `"No"`, where
-#'   `option = "No"` will remove the covariate effect from the specified
-#'   structural parameter(s), but retain the covariate in the model. Note:
-#'   `option = "PlusOne"` is only applicable to continuous and categorical
-#'   covariates in the case where structural parameters have `style =
-#'   "LogNormal"`. Multiple options are not supported (i.e. all covariate
-#'   effects in the call are supposed to have the same `option`. If different
-#'   `option`s are required for different covariate effects, sequential calls of
-#'   current method could be done.
+#' @param option Options are `"Yes"`, `"PlusOne"`, or `"No"`.
+#'   * `"Yes"`: Apply the covariate effect using the standard method
+#'   (multiplicative for LogNormal style, additive for Normal style).
+#'   * `"PlusOne"`: Apply the covariate effect using the "1 + effect"
+#'   formulation. This is only applicable to continuous and categorical
+#'   covariates where the affected structural parameter has `style = "LogNormal"`.
+#'   * `"No"`: Remove the specified covariate effect from the specified
+#'    structural parameter(s). The covariate itself (and its definition,
+#'    e.g., `fcovariate(Occ1)`) remains part of the model, but the link
+#'     between this covariate and the specified parameter(s) in the `stparm()`
+#'      statement is removed. See the note for the `effect` argument regarding
+#'      occasion covariates.
+#'   Multiple options are not supported within a single call (i.e., all
+#'   covariate effects listed in the `effect` argument for a single call must
+#'   use the same `option`). If different `option`s are required, use sequential
+#'   calls to `addCovariate`.
 #' @param center       Centering method. Options are `"Mean"`, `"Median"`,
 #'   `"Value"` or `"None"`. Only applicable to covariate `type = "Continuous"`.
 #'   Must include argument `centerValue` if `center = "Value"`.
@@ -423,7 +435,8 @@ occasionCovariate <- function(name = "",
 #'   ID = "Subject",
 #'   Time = "Act_Time",
 #'   A1 = "Amount",
-#'   CObs = "Conc"
+#'   CObs = "Conc",
+#'   workingDir = tempdir()
 #' )
 #'
 #' # Add Gender covariate of type categorical
@@ -498,31 +511,22 @@ addCovariate <- function(.Object,
     names(covariate) <- covariate
   }
 
-  cov <- names(covariate)
+  # covariate name from the argument
+  CovariateName <- names(covariate)
   covMappedColumn <- covariate
 
   stpnames <- structuralParameterNames(.Object)
-  if (cov %in% stpnames) {
-    stop(paste0("covariate '", cov, "' exists in structural parameter names"))
+  if (CovariateName %in% stpnames) {
+    stop(paste0(
+      "covariate '",
+      CovariateName,
+      "' exists in structural parameter names"
+    ))
   }
 
   covAvail <- FALSE
   mdata <- NULL
   . <- NULL # R CMD CHECK
-
-  if (!is.null(values)) {
-    if (isDiagonal) {
-      if (any(values <= 0)) {
-        stop("supplied `values` must be positive")
-      }
-    } else {
-      if (any(values < 0)) {
-        stop(
-          "`isDiagonal = FALSE` supplied `values` for block matrix must be greater than or equal to 0 "
-        )
-      }
-    }
-  }
 
   `%notin%` <- Negate(`%in%`)
 
@@ -641,7 +645,13 @@ addCovariate <- function(.Object,
     id_col_names <-
       gsub(" ", "", .Object@columnMapping@mapping$id@columnName)
   }
-  dt <- data.table::setDT(.Object@inputData)
+
+  if (is.null(.Object@inputData)) {
+    dt <- data.table::as.data.table(.Object@inputData)
+  } else {
+    dt <- data.table::setDT(.Object@inputData)
+  }
+
   if (type == "Continuous") {
     type <- Continuous
     if (!is.null(mdata) && covAvail) {
@@ -663,7 +673,7 @@ addCovariate <- function(.Object,
             stop(
               paste0(
                 "Error: continuous covariate ",
-                cov,
+                CovariateName,
                 " must have at least one numeric value assigned for each subject \n",
                 "Following subject(s) does not have one: ",
                 paste0(df[[.Object@columnMapping@mapping$id@columnName]], collapse = ", ")
@@ -733,7 +743,7 @@ addCovariate <- function(.Object,
               stop(
                 paste0(
                   "Error: must specify `labels` argument for covariate ",
-                  cov,
+                  CovariateName,
                   " or set numerical values for subject(s): ",
                   paste0(df[[.Object@columnMapping@mapping$id@columnName]], collapse = ", ")
                 )
@@ -749,7 +759,7 @@ addCovariate <- function(.Object,
               stop(
                 paste0(
                   "Error: must specify `labels` argument for covariate ",
-                  cov,
+                  CovariateName,
                   " or set numerical values for subject(s): ",
                   sub_ids
                 )
@@ -758,7 +768,7 @@ addCovariate <- function(.Object,
           }
         }
       } else if (!is.null(labels)) {
-        checkLabels(.Object, labels, covMappedColumn, cov)
+        checkLabels(.Object, labels, covMappedColumn, CovariateName)
       }
     }
 
@@ -779,12 +789,12 @@ addCovariate <- function(.Object,
   }
 
   covList <- .Object@covariateList
-  covName <- c()
+  CovariateNamesInModel <- c()
   for (i in seq_along(covList)) {
-    covName[i] <- covList[[i]]@name
+    CovariateNamesInModel[i] <- covList[[i]]@name
   }
 
-  if (covMappedColumn %notin% covName &&
+  if (covMappedColumn %notin% CovariateNamesInModel &&
       optionNum == DisableEffect) {
     stop(paste0(
       "covariate '",
@@ -807,10 +817,10 @@ addCovariate <- function(.Object,
     }
   }
 
-  if (cov %in% covName) {
+  if (CovariateName %in% CovariateNamesInModel) {
     # Check if Covariate already exists and update
     for (i in seq_along(covList)) {
-      if (!covList[[i]]@name %in% cov)
+      if (!covList[[i]]@name %in% CovariateName)
         next
 
       # covList[[i]]@type <- type #Removed so user cannot change existing covar type
@@ -821,6 +831,29 @@ addCovariate <- function(.Object,
       covList[[i]]@continuousType <- center
 
       currentCovEffNames <- names(covList[[i]]@covarEffList)
+      if (covList[[i]]@type == Occasion) {
+        if (!all(currentCovEffNames %in% effect)) {
+          stop(
+            paste0(
+              "Cannot modify occasion covariate '",
+              CovariateName,
+              "' using addCovariate as specified. ",
+              "When changing effects for an existing occasion covariate, all its current effects must be re-listed in the 'effect' argument. ",
+              "Current effects for '",
+              CovariateName,
+              "': [",
+              paste(currentCovEffNames, collapse = ", "),
+              "]. ",
+              "Effects missing from the call: [",
+              paste(currentCovEffNames[!currentCovEffNames %in% effect], collapse = ", "),
+              "]. "
+            )
+          )
+        } else if (option == "No") {
+          .Object@randomOccasionalEffectsStatements <- list()
+        }
+      }
+
       for (stParm in effect) {
         if (stParm %in% currentCovEffNames &&
             covList[[i]]@covarEffList[[stParm]] != optionNum) {
@@ -837,23 +870,26 @@ addCovariate <- function(.Object,
 
         covList[[i]]@covarEffList[[stParm]] <- optionNum
       }
+
+      # we found it; no need to iterate further
+      break
     }
 
     .Object@covariateList <- covList
   } else {
     # Add new covariate if covariate doesn't exist
     if (type == Category) {
-      covName <-
+      NewCovariateInstance <-
         categoricalCovariate(
-          name = cov,
+          name = CovariateName,
           categories = levels,
           categoryNames = labels,
           direction = direction
         )
     } else if (type == Occasion) {
-      covName <-
+      NewCovariateInstance <-
         occasionCovariate(
-          name = cov,
+          name = CovariateName,
           occasions = levels,
           occasionNames = labels,
           direction = direction,
@@ -861,8 +897,8 @@ addCovariate <- function(.Object,
         )
     } else {
       # if (type == Continuous)
-      covName <- NlmeCovariateParameter(
-        name = cov,
+      NewCovariateInstance <- NlmeCovariateParameter(
+        name = CovariateName,
         type = Continuous,
         continuousType = center,
         centerValue = as.character(centerValue),
@@ -872,28 +908,20 @@ addCovariate <- function(.Object,
       )
     }
 
-    coveffect <- covName@name
-    coveffects <-
-      vector(mode = "character", length = length(effect))
-    for (i in seq_along(effect)) {
-      coveffects[[i]] <- c(coveffect)
-    }
+    coveffects <- rep(CovariateName, length(effect))
     names(coveffects) <- effect
 
     .Object <-
       addCovariates(.Object,
-                    covariates = c(covName),
+                    NewCovariateInstance = NewCovariateInstance,
                     effects = c(coveffects))
 
-    if (!is.null(effect)) {
-      for (i in seq_along(effect)) {
-        covariateEffect(.Object, cov, effect[[i]]) <- optionNum
-      }
+    for (i in seq_along(effect)) {
+      covariateEffect(.Object, CovariateName, effect[[i]]) <- optionNum
     }
   }
 
   # Add random effect values specified for occasion covariate
-  .Object <- generatePMLModel(.Object)
   if (type == Occasion && optionNum == EnableEffect) {
     if (is.null(values)) {
       if (isDiagonal) {
@@ -902,9 +930,18 @@ addCovariate <- function(.Object,
         diagMatrix <- diag(1, nrow = length(effect), ncol = length(effect))
         values <- diagMatrix[upper.tri(diagMatrix, diag = TRUE)]
       }
-    }
-    if (isDiagonal) {
-      assertthat::assert_that(length(values) == length(effect), msg = "arguments `effect` and `values` are vectors of different lengths")
+    } else if (isDiagonal) {
+      if (length(values) != length(effect)) {
+        stop(
+          "isDiagonal = TRUE; incorrect number of `values` specified for corresponding `effect` in diagonal covariance matrix"
+        )
+      }
+
+      if (any(values <= 0)) {
+        stop(
+          "`values` specified for corresponding `effect` in diagonal covariance matrix must be positive"
+        )
+      }
     } else {
       covMatrix <- matrix(NA, length(effect), length(effect))
       tryCatch({
@@ -920,40 +957,51 @@ addCovariate <- function(.Object,
           "isDiagonal = FALSE; incorrect number of `values` specified for corresponding `effect` in block covariance matrix"
         )
       })
+
       covMatrix[lower.tri(covMatrix)] <-
         t(covMatrix)[lower.tri(covMatrix)]
+
       if (!.is.positive.definite(covMatrix)) {
         stop(
           "block covariance matrix specified is not positive definite for supplied `values` argument"
         )
       }
     }
-    initOccasionRandomEffect(.Object, covMappedColumn) <- values
+
+    .Object <- initOccasionRandomEffect(.Object = .Object,
+                                        covariateName = CovariateName,
+                                        values = values)
+
+    .Object@randomOccasionalEffectsStatements <-
+      as.list(randomOccasionalBlockStatement(.Object))
   }
+
+  .Object <- generatePMLModel(.Object)
 
   if (covAvail) {
     # && optionNum != DisableEffect){
     .check_column_mappings(covMappedColumn, data = mdata)
-    mappedColumn(.Object, cov) <- paste0(covMappedColumn)
-    .Object@columnMapping@mapping[[cov]]@variableType <-
+    mappedColumn(.Object, CovariateName) <- paste0(covMappedColumn)
+    .Object@columnMapping@mapping[[CovariateName]]@variableType <-
       list(type = "covariate",
            covType = type)
   } else {
-    if (!is.null(.Object@columnMapping@mapping[[cov]])) {
-      columnName <- .Object@columnMapping@mapping[[cov]]@columnName
+    if (!is.null(.Object@columnMapping@mapping[[CovariateName]])) {
+      columnName <-
+        .Object@columnMapping@mapping[[CovariateName]]@columnName
     } else {
       columnName <- "?"
     }
 
-    .Object@columnMapping@mapping[[cov]] <- NlmeColumnMap(
-      variableName = cov,
+    .Object@columnMapping@mapping[[CovariateName]] <- NlmeColumnMap(
+      variableName = CovariateName,
       columnName = columnName,
       variableType = list(type = "covariate",
                           covType = type)
     )
   }
 
-  return(.Object)
+  .Object
 }
 
 checkCatCovariateMappingColumn <-
@@ -982,7 +1030,9 @@ checkCatCovariateMappingColumn <-
                                       .(group_column_name = any(unlist(lapply(.SD, function(x) {
                                         any(grepl("\\s", x)) ||
                                           any(x == "") ||
-                                          any(x == "NA") || any(x == "na") || any(x == ".")
+                                          any(x == "NA") ||
+                                          any(x == "na") ||
+                                          any(x == ".")
                                       })))),
                                       by = id_col_names,
                                       .SDcols = c(columnToMap)]
@@ -1081,58 +1131,67 @@ checkCatCovariateMappingColumn <-
     }
   }
 
-checkLabels <- function(model, labels, covMappedColumn, cov) {
-  if (!is.null(model@columnMapping@mapping$id) &&
-      model@columnMapping@mapping$id@columnName != "?") {
-    dt <- data.table::setDT(model@inputData)
-    id_col_names <-
-      gsub(" ", "", model@columnMapping@mapping$id@columnName)
-    covLevelsData <-
-      dt[, .(group_column_name = any(unlist(lapply(.SD, tolower)) %in% tolower(labels)) ||
-               any(unlist(lapply(
-                 .SD, .is_numeric
-               )))),
-         by = id_col_names,
-         .SDcols = c(covMappedColumn)]
-
-    df <-
-      covLevelsData[group_column_name == FALSE |
-                      is.na(group_column_name),]
-    if (nrow(df) > 0) {
-      df$group_column_name <- NULL
-      if (ncol(df) == 1) {
-        stop(
-          paste0(
-            "The corresponding data column ",
-            covMappedColumn,
-            " for covariate ",
-            cov,
-            " does not contain any valid value for subject(s)  ",
-            paste0(df[[model@columnMapping@mapping$id@columnName]], collapse = ", ")
-          )
-        )
+checkLabels <-
+  function(model,
+           labels,
+           covMappedColumn,
+           CovariateName) {
+    if (!is.null(model@columnMapping@mapping$id) &&
+        model@columnMapping@mapping$id@columnName != "?") {
+      if (is.null(model@inputData)) {
+        dt <- data.table::as.data.table(model@inputData)
       } else {
-        sub_ids <- ""
-        for (row in 1:nrow(df)) {
-          sub_ids <-
-            paste0(sub_ids,
-                   paste0(colnames(df), "=", df[row,], collapse = " "),
-                   ";")
-        }
-        stop(
-          paste0(
-            "The corresponding data column ",
-            covMappedColumn,
-            " for covariate ",
-            cov,
-            " does not contain any valid value for subject(s)  ",
-            sub_ids
+        dt <- data.table::setDT(model@inputData)
+      }
+
+      id_col_names <-
+        gsub(" ", "", model@columnMapping@mapping$id@columnName)
+      covLevelsData <-
+        dt[, .(group_column_name = any(unlist(lapply(.SD, tolower)) %in% tolower(labels)) ||
+                 any(unlist(lapply(
+                   .SD, .is_numeric
+                 )))),
+           by = id_col_names,
+           .SDcols = c(covMappedColumn)]
+
+      df <-
+        covLevelsData[group_column_name == FALSE |
+                        is.na(group_column_name),]
+      if (nrow(df) > 0) {
+        df$group_column_name <- NULL
+        if (ncol(df) == 1) {
+          stop(
+            paste0(
+              "The corresponding data column ",
+              covMappedColumn,
+              " for covariate ",
+              CovariateName,
+              " does not contain any valid value for subject(s)  ",
+              paste0(df[[model@columnMapping@mapping$id@columnName]], collapse = ", ")
+            )
           )
-        )
+        } else {
+          sub_ids <- ""
+          for (row in 1:nrow(df)) {
+            sub_ids <-
+              paste0(sub_ids,
+                     paste0(colnames(df), "=", df[row,], collapse = " "),
+                     ";")
+          }
+          stop(
+            paste0(
+              "The corresponding data column ",
+              covMappedColumn,
+              " for covariate ",
+              CovariateName,
+              " does not contain any valid value for subject(s)  ",
+              sub_ids
+            )
+          )
+        }
       }
     }
   }
-}
 
 
 #' Remove covariate from structural parameters in a model object.
@@ -1140,8 +1199,11 @@ checkLabels <- function(model, labels, covMappedColumn, cov) {
 #' Remove one or more covariates from structural parameters in a model object.
 #'
 #' @param .Object Model object
-#' @param covariate Covariates to remove from model. If \code{NULL} all covariates will be removed from model.
-#' @param paramName Structural parameters for which to remove covariate effect(s) from. If \code{NULL} covariate effect will be removed from all structural parameters.
+#' @param covariate Covariates to remove from model. If \code{NULL} all
+#'   covariates will be removed from model.
+#' @param paramName Structural parameters for which to remove covariate
+#'   effect(s) from. If \code{NULL} covariate effect will be removed from all
+#'   structural parameters.
 #'
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
@@ -1151,7 +1213,8 @@ checkLabels <- function(model, labels, covMappedColumn, cov) {
 #'   ID = "Subject",
 #'   Time = "Act_Time",
 #'   A1 = "Amount",
-#'   CObs = "Conc"
+#'   CObs = "Conc",
+#'   workingDir = tempdir()
 #' )
 #'
 #' # Add Gender covariate of type categorical
@@ -1180,56 +1243,96 @@ removeCovariate <-
   function(.Object,
            covariate = NULL,
            paramName = NULL) {
-    if (is.null(covariate) && is.null(paramName)) {
-      .Object <- resetCovariateEffects(.Object)
-      .Object@covariateList <- list()
-      .Object <- generatePML(.Object)
-      return(.Object)
+    covariatesInModel <-
+      sapply(.Object@covariateList, function(x)
+        x@name)
+    stParmsInModel <-
+      sapply(.Object@structuralParams, function(x)
+        x@name)
+
+    if (is.null(covariate)) {
+      covariate <- covariatesInModel
+    } else if (!all(covariate %in% covariatesInModel)) {
+      stop("Covariate(s) not found in the model: ",
+           paste(covariate[!(covariate %in% covariatesInModel)], collapse = ", "))
     }
+
+    # actually paramName could be a vector, for clarity renaming it
+    paramNames <- paramName
+    if (is.null(paramNames)) {
+      paramNames <- stParmsInModel
+    } else if (!all(paramNames %in% stParmsInModel)) {
+      stop(
+        "Structural parameter(s) not found in the model: ",
+        paste(paramNames[!(paramNames %in% stParmsInModel)], collapse = ", ")
+      )
+    }
+
 
     covList <- .Object@covariateList
-    covNames <- vector(mode = "list", length = length(covList))
-
-    `%notin%` <- Negate(`%in%`)
 
     for (i in seq_along(covList)) {
-      covNames[[i]] <- covList[[i]]@name
-    }
+      if (!any(covariate %in% covList[[i]]@name))
+        next
 
-    for (i in seq_along(covariate)) {
-      if (covariate[[i]] %notin% covNames) {
-        stop(paste0(
-          "covariate '",
-          covariate[[i]],
-          "' not found in existing covariate names"
-        ))
-      }
-    }
+      currentCovListEffects <- names(covList[[i]]@covarEffList)
+      # we will remove the covariate if all structural parameters in coveffects
+      # are given in paramName
+      if (all(currentCovListEffects %in% paramNames)) {
+        .Object@columnMapping@mapping[[covList[[i]]@name]] <- NULL
+        covList[[i]] <- list()
+      } else {
+        # remove the covariate from the structural parameters
+        for (CovListEffect in currentCovListEffects) {
+          if (!CovListEffect %in% paramNames)
+            next
 
-    if (!is.null(covariate) && is.null(paramName)) {
-      for (i in seq_along(covList)) {
-        if (any(covariate %in% covList[[i]]@name)) {
-          .Object@columnMapping@mapping[[covList[[i]]@name]] <- NULL
-          covList[[i]] <- list()
-        }
-      }
-      covList <- covList[lapply(covList, length) > 0]
-      .Object@covariateList <- covList
-    }
-
-    if (!is.null(covariate) && !is.null(paramName)) {
-      for (i in seq_along(covList)) {
-        if (any(covariate %in% covList[[i]]@name)) {
-          for (j in seq_along(covList[[i]]@covarEffList)) {
-            if (any(paramName %in% names(covList[[i]]@covarEffList[j]))) {
-              covList[[i]]@covarEffList[j] <- NULL
-            }
+          if (covList[[i]]@type != Occasion) {
+            covList[[i]]@covarEffList[CovListEffect] <- NULL
+            next
           }
+
+          # the following is related to occasion only
+          j <- which(CovListEffect == currentCovListEffects,
+                     arr.ind = TRUE)
+          # need to modify catEffInitValues
+          if (covList[[i]]@isDiagonal) {
+            covList[[i]]@catEffInitValues <- covList[[i]]@catEffInitValues[-j]
+          } else {
+            catEffInitValues <- unlist(covList[[i]]@catEffInitValues)
+            RaneEffMatrix <-
+              matrix(
+                0,
+                nrow = length(covList[[i]]@covarEffList),
+                ncol = length(covList[[i]]@covarEffList)
+              )
+            RaneEffMatrixIndices <-
+              upper.tri(RaneEffMatrix, diag = TRUE)
+            # since R fills matrix in column manner, we will use upper.tri
+            RaneEffMatrix[RaneEffMatrixIndices] <-
+              catEffInitValues
+            RaneEffMatrix <- t(RaneEffMatrix)
+            RaneEffMatrixNew <- RaneEffMatrix[-j, -j]
+            # transform back
+            RaneEffMatrixNew <- t(RaneEffMatrixNew)
+            catEffInitValues <-
+              RaneEffMatrixNew[upper.tri(RaneEffMatrixNew, diag = TRUE)]
+            covList[[i]]@catEffInitValues <-
+              as.list(catEffInitValues)
+          }
+
+          currentCovListEffects <- currentCovListEffects[-j]
+          covList[[i]]@covarEffList[CovListEffect] <- NULL
         }
       }
+    }
+
+    if (length(covList) > 0) {
+      covList <- covList[lengths(covList) > 0]
     }
 
     .Object@covariateList <- covList
+    .Object@randomOccasionalEffectsStatements <- list()
 
     .Object <- generatePML(.Object)
     .Object

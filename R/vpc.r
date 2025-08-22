@@ -50,11 +50,20 @@
 #'   CObs = "Conc",
 #'   Aa = "Amount",
 #'   data = pkData,
-#'   modelName = "PkModel"
+#'   modelName = "PkModel",
+#'   workingDir = tempdir()
 #' )
-#' results <- simmodel(model, simParams)
+#'
+#' host <- hostParams(
+#'   sharedDirectory = tempdir(),
+#'   parallelMethod = "NONE",
+#'   hostName = "local",
+#'   numCores = 1
+#'  )
+#'
+#' results <- simmodel(model, simParams, hostPlatform = host)
 #' # with seed given additionally:
-#' results <- simmodel(model, simParams, seed = 3527)
+#' results <- simmodel(model, simParams, hostPlatform = host, seed = 3527)
 #' }
 #' @export
 simmodel <- function(model,
@@ -145,13 +154,32 @@ simmodel <- function(model,
 #'
 #' @examples
 #' \donttest{
+#' model <- pkmodel(
+#'   numComp = 1,
+#'   absorption = "Extravascular",
+#'   ID = "Subject",
+#'   Time = "Act_Time",
+#'   CObs = "Conc",
+#'   Aa = "Amount",
+#'   data = pkData,
+#'   modelName = "PkModel",
+#'   workingDir = tempdir()
+#' )
 #'
-#' job <- fitmodel(model)
+#'  host <- hostParams(
+#'   sharedDirectory = tempdir(),
+#'   parallelMethod = "NONE",
+#'   hostName = "local",
+#'   numCores = 1
+#'  )
 #'
-#' # View estimation results
-#' print(job)
+#' job <- fitmodel(model = model,
+#'                 hostPlatform = host)
 #'
-#' finalModelVPC <- copyModel(model, acceptAllEffects = TRUE, modelName = "model_VPC")
+#' finalModelVPC <- copyModel(model,
+#'                            acceptAllEffects = TRUE,
+#'                            modelName = "model_VPC",
+#'                            workingDir = tempdir())
 #'
 #' # View the model
 #' print(finalModelVPC)
@@ -160,9 +188,9 @@ simmodel <- function(model,
 #' vpcSetup <- NlmeVpcParams(outputPRED = TRUE)
 #'
 #' # Run VPC using the default host, default values for the relevant NLME engine arguments
-#' finalVPCJob <- vpcmodel(model = finalModelVPC, vpcParams = vpcSetup)
+#' finalVPCJob <- vpcmodel(model = finalModelVPC, vpcParams = vpcSetup, hostPlatform = host)
 #' # the same as:
-#' finalVPCJob <- vpcmodel(model = finalModelVPC, outputPRED = TRUE)
+#' # finalVPCJob <- vpcmodel(model = finalModelVPC, outputPRED = TRUE)
 #'
 #' # Observed dataset predcheck0.csv
 #' dt_ObsData <- finalVPCJob$predcheck0
@@ -175,23 +203,23 @@ simmodel <- function(model,
 #'
 #' # tidyvpc package VPC example:
 #' # library(tidyvpc)
-#' library(magrittr)
+#' # library(magrittr)
 #' # Create a regular VPC plot with binning method set to be "jenks"
-#' binned_VPC <- observed(dt_ObsData, x = IVAR, yobs = DV) %>%
-#'   simulated(dt_SimData, ysim = DV) %>%
-#'   binning(bin = "jenks") %>%
-#'   vpcstats()
+#' # binned_VPC <- observed(dt_ObsData, x = IVAR, yobs = DV) %>%
+#' # simulated(dt_SimData, ysim = DV) %>%
+#' # binning(bin = "jenks") %>%
+#' # vpcstats()
 #'
-#' plot_binned_VPC <- plot(binned_VPC)
+#' # plot_binned_VPC <- plot(binned_VPC)
 #'
 #' # Create a pcVPC plot with binning method set to be "jenks"
-#' binned_pcVPC <- observed(dt_ObsData, x = IVAR, yobs = DV) %>%
-#'   simulated(dt_SimData, ysim = DV) %>%
-#'   binning(bin = "jenks") %>%
-#'   predcorrect(pred = PRED) %>%
-#'   vpcstats()
+#' # binned_pcVPC <- observed(dt_ObsData, x = IVAR, yobs = DV) %>%
+#' #   simulated(dt_SimData, ysim = DV) %>%
+#' #   binning(bin = "jenks") %>%
+#' #   predcorrect(pred = PRED) %>%
+#' #   vpcstats()
 #'
-#' plot_binned_pcVPC <- plot(binned_pcVPC)
+#' # plot_binned_pcVPC <- plot(binned_pcVPC)
 #' }
 #'
 #' @export
@@ -467,17 +495,35 @@ setMethod("initialize", "NlmeObservationVar",
 #'
 #' @seealso \code{\link{tableParams}, \link{NlmeSimTableDef}, \link{NlmeObservationVar}}
 #'
-#' @export NlmeVpcParams
 #'
 #' @examples
 #' \donttest{
+#' model <- pkmodel(
+#'   parameterization = "Clearance",
+#'   numCompartments = 2,
+#'   data = pkData,
+#'   ID = "Subject",
+#'   Time = "Act_Time",
+#'   A1 = "Amount",
+#'   CObs = "Conc",
+#'   workingDir = tempdir()
+#'   )
 #'
-#' job <- fitmodel(model)
+#' # Define the host
+#' host <- hostParams(parallelMethod = "NONE",
+#'                    hostName = "local",
+#'                    numCores = 1,
+#'                    sharedDirectory = tempdir())
+#' job <- fitmodel(model,
+#'                 hostPlatform = host)
 #'
 #' # View estimation results
 #' print(job)
 #'
-#' finalModelVPC <- copyModel(model, acceptAllEffects = TRUE, modelName = "model_VPC")
+#' finalModelVPC <- copyModel(model,
+#'                            acceptAllEffects = TRUE,
+#'                            modelName = "model_VPC",
+#'                            workingDir = tempdir())
 #'
 #' # View the model
 #' print(finalModelVPC)
@@ -486,9 +532,12 @@ setMethod("initialize", "NlmeObservationVar",
 #' vpcSetup <- NlmeVpcParams(outputPRED = TRUE)
 #'
 #' # Run VPC using the default host, default values for the relevant NLME engine arguments
-#' finalVPCJob <- vpcmodel(model = finalModelVPC, vpcParams = vpcSetup)
+#' finalVPCJob <-
+#'   vpcmodel(model = finalModelVPC, vpcParams = vpcSetup, )
 #'
 #' }
+#'
+#' @export NlmeVpcParams
 #' @keywords internal
 NlmeVpcParams <- setClass(
   "NlmeVpcParams",

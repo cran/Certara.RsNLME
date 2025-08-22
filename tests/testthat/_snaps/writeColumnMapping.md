@@ -29,33 +29,40 @@
     $params
     
      Engine Parameters 
-     ------------------------------------------- 
-    Is population               :  TRUE
-    Sort input data             :  TRUE
-    Engine used                 :  FOCE-ELS
-    Maximum number of iterations:  1000
-    ODE solver                  :  Matrix Exponent
+     -------------------------------------------
+    Is population                 : TRUE
+    Sort input data               : TRUE
+    Engine used                   : FOCE-ELS
+    Max iterations                : 1000
+    ODE solver                    : Matrix Exponent
+    Allow Log-transform           : TRUE
     
      Advanced Options 
-     ------------------------------------------- 
-    Number of integration points:  1
-    Number of non-param iter    :  0
-    Number of MAPNP iter        :  0
-    Use synthetic gradients     :  FALSE
-    LAGL nDigit                 :  7
-    BLUP nDigit                 :  13
-    Linearization step size     :  0.002
-    ODE relative tolerance      :  1e-06
-    ODE absolute tolerance      :  1e-06
-    ODE max steps               :  50000
+     -------------------------------------------
+    Integration points            : 1
+    fastOptimization              : FALSE
+    Outer Grad Tolerance          : 2e-04
+    Outer Step Tolerance          : 1e-04
+    Inner Grad Tolerance          : 1.71e-05
+    Inner Step Tolerance          : 7.07e-08
+    LL Delta Tolerance            : 0.001
+    Non-param iter                : 0
+    MAPNP iter                    : 0
+    LAGL nDigit                   : 7
+    BLUP nDigit                   : 13
+    Linearization step size       : 0.002
+    ODE relative tolerance        : 1e-06
+    ODE absolute tolerance        : 1e-06
+    ODE max steps                 : 50000
     
      Standard Errors 
-     ------------------------------------------- 
-    Standard Errors Method      :  Sandwich
-    Finite Difference Method    :  Central Difference
-    Step size                   :  0.01
+     -------------------------------------------
+    Standard Errors Method        : Sandwich
+    Finite Difference Method      : Central Difference
+    Step size                     : 0.01
     
      ------------------------------------------- 
+    
 
 # model from OneCpt_dp1IVBolus_dp2IVInf_doseSt_D.mmdl created properly:
 
@@ -87,33 +94,40 @@
     $params
     
      Engine Parameters 
-     ------------------------------------------- 
-    Is population               :  TRUE
-    Sort input data             :  TRUE
-    Engine used                 :  FOCE-ELS
-    Maximum number of iterations:  1000
-    ODE solver                  :  Matrix Exponent
+     -------------------------------------------
+    Is population                 : TRUE
+    Sort input data               : TRUE
+    Engine used                   : FOCE-ELS
+    Max iterations                : 1000
+    ODE solver                    : Matrix Exponent
+    Allow Log-transform           : TRUE
     
      Advanced Options 
-     ------------------------------------------- 
-    Number of integration points:  1
-    Number of non-param iter    :  0
-    Number of MAPNP iter        :  0
-    Use synthetic gradients     :  FALSE
-    LAGL nDigit                 :  7
-    BLUP nDigit                 :  13
-    Linearization step size     :  0.002
-    ODE relative tolerance      :  1e-06
-    ODE absolute tolerance      :  1e-06
-    ODE max steps               :  50000
+     -------------------------------------------
+    Integration points            : 1
+    fastOptimization              : FALSE
+    Outer Grad Tolerance          : 2e-04
+    Outer Step Tolerance          : 1e-04
+    Inner Grad Tolerance          : 1.71e-05
+    Inner Step Tolerance          : 7.07e-08
+    LL Delta Tolerance            : 0.001
+    Non-param iter                : 0
+    MAPNP iter                    : 0
+    LAGL nDigit                   : 7
+    BLUP nDigit                   : 13
+    Linearization step size       : 0.002
+    ODE relative tolerance        : 1e-06
+    ODE absolute tolerance        : 1e-06
+    ODE max steps                 : 50000
     
      Standard Errors 
-     ------------------------------------------- 
-    Standard Errors Method      :  Sandwich
-    Finite Difference Method    :  Central Difference
-    Step size                   :  0.01
+     -------------------------------------------
+    Standard Errors Method        : Sandwich
+    Finite Difference Method      : Central Difference
+    Step size                     : 0.01
     
      ------------------------------------------- 
+    
 
 # model from OneCpt_dp1IVBolus_dp2IVInf_doseSt_R.mmdl created properly:
 
@@ -145,33 +159,40 @@
     $params
     
      Engine Parameters 
-     ------------------------------------------- 
-    Is population               :  TRUE
-    Sort input data             :  TRUE
-    Engine used                 :  FOCE-ELS
-    Maximum number of iterations:  1000
-    ODE solver                  :  Matrix Exponent
+     -------------------------------------------
+    Is population                 : TRUE
+    Sort input data               : TRUE
+    Engine used                   : FOCE-ELS
+    Max iterations                : 1000
+    ODE solver                    : Matrix Exponent
+    Allow Log-transform           : TRUE
     
      Advanced Options 
-     ------------------------------------------- 
-    Number of integration points:  1
-    Number of non-param iter    :  0
-    Number of MAPNP iter        :  0
-    Use synthetic gradients     :  FALSE
-    LAGL nDigit                 :  7
-    BLUP nDigit                 :  13
-    Linearization step size     :  0.002
-    ODE relative tolerance      :  1e-06
-    ODE absolute tolerance      :  1e-06
-    ODE max steps               :  50000
+     -------------------------------------------
+    Integration points            : 1
+    fastOptimization              : FALSE
+    Outer Grad Tolerance          : 2e-04
+    Outer Step Tolerance          : 1e-04
+    Inner Grad Tolerance          : 1.71e-05
+    Inner Step Tolerance          : 7.07e-08
+    LL Delta Tolerance            : 0.001
+    Non-param iter                : 0
+    MAPNP iter                    : 0
+    LAGL nDigit                   : 7
+    BLUP nDigit                   : 13
+    Linearization step size       : 0.002
+    ODE relative tolerance        : 1e-06
+    ODE absolute tolerance        : 1e-06
+    ODE max steps                 : 50000
     
      Standard Errors 
-     ------------------------------------------- 
-    Standard Errors Method      :  Sandwich
-    Finite Difference Method    :  Central Difference
-    Step size                   :  0.01
+     -------------------------------------------
+    Standard Errors Method        : Sandwich
+    Finite Difference Method      : Central Difference
+    Step size                     : 0.01
     
      ------------------------------------------- 
+    
 
 # model from OneCpt_dp1IVInf_dp2IVInf_doseSt_D_D.mmdl created properly:
 
@@ -202,33 +223,40 @@
     $params
     
      Engine Parameters 
-     ------------------------------------------- 
-    Is population               :  TRUE
-    Sort input data             :  TRUE
-    Engine used                 :  FOCE-ELS
-    Maximum number of iterations:  1000
-    ODE solver                  :  Matrix Exponent
+     -------------------------------------------
+    Is population                 : TRUE
+    Sort input data               : TRUE
+    Engine used                   : FOCE-ELS
+    Max iterations                : 1000
+    ODE solver                    : Matrix Exponent
+    Allow Log-transform           : TRUE
     
      Advanced Options 
-     ------------------------------------------- 
-    Number of integration points:  1
-    Number of non-param iter    :  0
-    Number of MAPNP iter        :  0
-    Use synthetic gradients     :  FALSE
-    LAGL nDigit                 :  7
-    BLUP nDigit                 :  13
-    Linearization step size     :  0.002
-    ODE relative tolerance      :  1e-06
-    ODE absolute tolerance      :  1e-06
-    ODE max steps               :  50000
+     -------------------------------------------
+    Integration points            : 1
+    fastOptimization              : FALSE
+    Outer Grad Tolerance          : 2e-04
+    Outer Step Tolerance          : 1e-04
+    Inner Grad Tolerance          : 1.71e-05
+    Inner Step Tolerance          : 7.07e-08
+    LL Delta Tolerance            : 0.001
+    Non-param iter                : 0
+    MAPNP iter                    : 0
+    LAGL nDigit                   : 7
+    BLUP nDigit                   : 13
+    Linearization step size       : 0.002
+    ODE relative tolerance        : 1e-06
+    ODE absolute tolerance        : 1e-06
+    ODE max steps                 : 50000
     
      Standard Errors 
-     ------------------------------------------- 
-    Standard Errors Method      :  Sandwich
-    Finite Difference Method    :  Central Difference
-    Step size                   :  0.01
+     -------------------------------------------
+    Standard Errors Method        : Sandwich
+    Finite Difference Method      : Central Difference
+    Step size                     : 0.01
     
      ------------------------------------------- 
+    
 
 # model from OneCpt_dp1IVInf_dp2IVInf_doseSt_R_R.mmdl created properly:
 
@@ -259,31 +287,38 @@
     $params
     
      Engine Parameters 
-     ------------------------------------------- 
-    Is population               :  TRUE
-    Sort input data             :  TRUE
-    Engine used                 :  FOCE-ELS
-    Maximum number of iterations:  1000
-    ODE solver                  :  Matrix Exponent
+     -------------------------------------------
+    Is population                 : TRUE
+    Sort input data               : TRUE
+    Engine used                   : FOCE-ELS
+    Max iterations                : 1000
+    ODE solver                    : Matrix Exponent
+    Allow Log-transform           : TRUE
     
      Advanced Options 
-     ------------------------------------------- 
-    Number of integration points:  1
-    Number of non-param iter    :  0
-    Number of MAPNP iter        :  0
-    Use synthetic gradients     :  FALSE
-    LAGL nDigit                 :  7
-    BLUP nDigit                 :  13
-    Linearization step size     :  0.002
-    ODE relative tolerance      :  1e-06
-    ODE absolute tolerance      :  1e-06
-    ODE max steps               :  50000
+     -------------------------------------------
+    Integration points            : 1
+    fastOptimization              : FALSE
+    Outer Grad Tolerance          : 2e-04
+    Outer Step Tolerance          : 1e-04
+    Inner Grad Tolerance          : 1.71e-05
+    Inner Step Tolerance          : 7.07e-08
+    LL Delta Tolerance            : 0.001
+    Non-param iter                : 0
+    MAPNP iter                    : 0
+    LAGL nDigit                   : 7
+    BLUP nDigit                   : 13
+    Linearization step size       : 0.002
+    ODE relative tolerance        : 1e-06
+    ODE absolute tolerance        : 1e-06
+    ODE max steps                 : 50000
     
      Standard Errors 
-     ------------------------------------------- 
-    Standard Errors Method      :  Sandwich
-    Finite Difference Method    :  Central Difference
-    Step size                   :  0.01
+     -------------------------------------------
+    Standard Errors Method        : Sandwich
+    Finite Difference Method      : Central Difference
+    Step size                     : 0.01
     
      ------------------------------------------- 
+    
 

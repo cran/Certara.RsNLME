@@ -50,8 +50,13 @@ Add Steady State or ADDL dosing cycle to model object.
 }
 \examples{
 \donttest{
-model <- pkmodel(columnMap = FALSE) \%>\%
-  addDoseCycle(type = "SteadyState", name = "A1", amount = "Amount", II = "II")
+model <- addDoseCycle(pkmodel(columnMap = FALSE,
+                              isPopulation = FALSE,
+                              workingDir = tempdir()),
+                      type = "SteadyState",
+                      name = "A1",
+                      amount = "Amount",
+                      II = "II")
 }
 
 }

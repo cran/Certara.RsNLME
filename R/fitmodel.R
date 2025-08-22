@@ -97,7 +97,8 @@
 #' \donttest{
 #'
 #'  # Define the host
-#'  host <- hostParams(parallelMethod = "None",
+#'  host <- hostParams(sharedDirectory = tempdir(),
+#'                     parallelMethod = "None",
 #'                     hostName = "local",
 #'                     numCores = 1)
 #'  # Define the model
@@ -108,7 +109,8 @@
 #'                   CObs = "Conc",
 #'                   Aa = "Amount",
 #'                   data = pkData,
-#'                   modelName = "PkModel")
+#'                   modelName = "PkModel",
+#'                   workingDir = tempdir())
 #'
 #'  Table01 <- tableParams(name = "SimTableObs.csv",
 #'                         timesList = "0,1,2,4,4.9,55.1,56,57,59,60",
@@ -123,7 +125,6 @@
 #'
 #'  # Define the engine parameters
 #'  params <- engineParams(model)
-#'
 #'  # Fit model
 #'  res <- fitmodel(model = model,
 #'                  hostPlatform = host,

@@ -57,11 +57,13 @@ model <-
     ID = "Subject",
     Time = "Act_Time",
     A1 = "Amount",
-    CObs = "Conc"
+    CObs = "Conc",
+    workingDir = tempdir()
   )
 
 # multicore
 multicoreHost <- hostParams(
+  sharedDirectory = tempdir(),
   parallelMethod = "Multicore",
   hostName = "local_multicore",
   numCores = 4

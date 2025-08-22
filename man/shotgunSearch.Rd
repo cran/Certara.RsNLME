@@ -53,7 +53,8 @@ model <- pkmodel(numCompartments = 2,
                  ID = "Subject",
                  Time = "Act_Time",
                  A1 = "Amount",
-                 CObs = "Conc")
+                 CObs = "Conc",
+                 workingDir = tempdir())
 
 # Add Gender covariate of type categorical
 model <- addCovariate(model,
@@ -72,12 +73,13 @@ model <- addCovariate(model,
              effect = c("V", "Cl"))
 
 # Define the host
-host <- hostParams(parallelMethod = "None",
+host <- hostParams(parallelMethod = "MULTICORE",
                    hostName = "local",
-                   numCores = 1)
+                   numCores = 8,
+                   sharedDirectory = tempdir())
 
 # Define the engine parameters
-params <- engineParams(model)
+params <- engineParams(model, fastOptimization = TRUE, numIterations = 7)
 
 # Define covariate model
 cp <- covariateModel(model)

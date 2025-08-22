@@ -26,18 +26,23 @@
     if (removeComments) {
       # do not collapse multiple blocks
       if (multipleBlocks) {
-        collapse = NULL
+        mmdlBlock <-
+          .remove_comments(
+            mmdlBlock,
+            removeWhites = FALSE,
+            type = "All",
+            collapse = NULL
+          )
       } else {
-        collapse = ""
+        mmdlBlock <-
+          .remove_comments(
+            mmdlBlock,
+            removeWhites = FALSE,
+            type = "Sharp",
+            collapse = ""
+          )
       }
 
-      mmdlBlock <-
-        .remove_comments(
-          mmdlBlock,
-          removeWhites = FALSE,
-          type = "All",
-          collapse = collapse
-        )
     }
 
     if (onerow) {

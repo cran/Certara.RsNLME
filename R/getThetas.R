@@ -6,7 +6,16 @@
 #'
 #' @examples
 #' \donttest{
-#' getThetas(pkpdmodel)
+#' model <- emaxmodel(
+#'   checkBaseline = TRUE,
+#'   checkFractional = TRUE,
+#'   checkInhibitory = TRUE,
+#'   data = pkpdData,
+#'   ID = "ID",
+#'   C = "CObs",
+#'   EObs = "EObs"
+#' )
+#' getThetas(model)
 #' }
 #' @return Character vector of theta names defined in model
 #' @export

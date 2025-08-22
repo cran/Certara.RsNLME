@@ -440,7 +440,7 @@ setMethod(
       return()
     }
 
-    stat <- NlmeJobStatus(job)
+    stat <- NlmeJobStatus(.Object)
 
     if (stat == "InProgress") {
       cat("STOP",
@@ -570,17 +570,39 @@ setMethod(
 
 #' Print generic for class Simple.NlmeJob
 #'
-#' Reads progress file and prints out its contents
+#' Reads progress file and prints out its contents.
+#' Applicable to remote jobs or jobs running in backgroud.
 #'
 #' @param  x Handle to an NLME job
 #' @inheritParams ellipsis::dots_used
 #'
 #' @examples
 #' \donttest{
-#'   print(jobHandle)
+#' model <- pkmodel(
+#'   parameterization = "Clearance",
+#'   numCompartments = 2,
+#'   data = pkData,
+#'   ID = "Subject",
+#'   Time = "Act_Time",
+#'   A1 = "Amount",
+#'   CObs = "Conc",
+#'   workingDir = tempdir()
+#'   )
+#'  host <- hostParams(sharedDirectory = tempdir(),
+#'                     parallelMethod = "None",
+#'                     hostName = "local",
+#'                     numCores = 1)
+#' if (.Platform$OS.type == "unix") {
+#' # background is not supported on Windows
+#'   job <- fitmodel(model,
+#'                   numIterations = 3,
+#'                   hostPlatform = host,
+#'                   runrunInBackground = TRUE)
+#'   print(job)
 #' }
-#' @export
+#' }
 #' @return \code{NULL}
+#' @export
 #' @keywords internal
 print.SimpleNlmeJob <- function(x, ...) {
   tryCatch({

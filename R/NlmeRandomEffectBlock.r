@@ -18,8 +18,8 @@ Block <- 2
 #'
 #' @name  NlmeRandomEffectBlock
 #' @rdname NlmeRandomEffectBlock
+#' @noRd
 #' @keywords internal
-
 NlmeRandomEffectBlock <- setClass(
   "NlmeRandomEffectBlock",
   slots = c(
@@ -62,6 +62,7 @@ setMethod("initialize", "NlmeRandomEffectBlock",
 #'   values = matrix(c(1,0.01,0.01,1), ncol = 2,
 #'     dimnames = list(c("Cl", "V"), c("Cl", "V"))))
 #' }
+#' @noRd
 #' @keywords internal
 NlmeRandomEffectValues <- setClass(
   "NlmeRandomEffectValues",
@@ -113,7 +114,8 @@ setMethod("initialize", "NlmeRandomEffectValues",
 #' @param model Model object
 #'
 #' @examples
-#' model <- pkmodel(columnMap = FALSE)
+#' model <- pkmodel(columnMap = FALSE,
+#'                  workingDir = tempdir())
 #' getRandomEffectNames(model)
 #'
 #' @export

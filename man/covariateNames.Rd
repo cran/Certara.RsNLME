@@ -16,7 +16,8 @@ Character vector of covariate names defined in model
 Use to return character vector of covariate names available in model object.
 }
 \examples{
-model <- pkmodel(columnMap = FALSE)
+model <- pkmodel(columnMap = FALSE,
+                 workingDir = tempdir())
 model <- addCovariate(model, covariate = "BW", effect = "V")
 model <- addCovariate(model, covariate = "Age", effect = "Cl")
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/engine_params.r
 \name{engineParams}
 \alias{engineParams}
-\title{Specify engine parameters for model execution}
+\title{Main function to specify engine parameters}
 \usage{
 engineParams(
   model,
@@ -16,14 +16,21 @@ engineParams(
   stdErr = NULL,
   isCentralDiffStdErr = TRUE,
   stepSizeStdErr = NULL,
+  logTransform = NULL,
   numIntegratePtsAGQ = 1,
   numIterNonParametric = 0,
   allowSyntheticGradient = FALSE,
+  fastOptimization = FALSE,
   numIterMAPNP = 0,
   numRepPCWRES = 0,
   stepSizeLinearize = 0.002,
   numDigitLaplacian = 7,
   numDigitBlup = 13,
+  gradTolOuter = 2e-04,
+  stepTolOuter = 1e-04,
+  gradTolInner = 1.71e-05,
+  stepTolInner = 7.07e-08,
+  refDeltaLagl = 0.001,
   mapAssist = 0,
   iSample = 300,
   iAcceptRatio = 0.1,
@@ -35,136 +42,292 @@ engineParams(
   MCPEM = FALSE,
   runAllIterations = FALSE,
   scramble = "Owen",
+  emTolType = 0,
+  emConvLen = 10,
+  emConvCritVal = 5,
   stepSizePartialDeriv = 1e-05,
   numTimeStepPartialDeriv = 20
 )
 }
 \arguments{
-\item{model}{Model object}
+\item{model}{Model object.  The type of model (population or individual) is
+determined by the model@isPopulation slot.  If model@isPopulation is TRUE,
+the model is treated as a population model; otherwise, it's treated as an
+individual model.}
 
-\item{sort}{Logical; Specifying whether or not to sort the input data by subject and time values.
+\item{sort}{Logical; Specifies whether to sort the input data by subject and
+time. If \code{TRUE}, data are sorted. If \code{FALSE}, data are not
+sorted. Defaults to \code{FALSE} if the model contains reset information
+(\code{model@hasResetInfo = TRUE}); otherwise, defaults to \code{TRUE}.}
+
+\item{ODE}{Character; Specifies the ODE solver to be used. Options are:
+\code{"MatrixExponent"}, \code{"DVERK"}, \code{"DOPRI5"},
+\code{"AutoDetect"}, \code{"Stiff"}, \code{"LSODE"}. See Details section
+for a description of each solver.}
+
+\item{rtolODE}{Numeric; Specifying relative tolerance for the numerical ODE
+solver.}
+
+\item{atolODE}{Numeric; Specifying absolute tolerance for the numerical ODE
+solver.}
+
+\item{maxStepsODE}{Numeric; Specifies the maximum number of steps allowed for
+the ODE solver.}
+
+\item{numIterations}{Integer; Specifies the maximum number of iterations for
+the estimation algorithm. Must be a non-negative integer, with a maximum
+value of 10000.}
+
+\item{method}{Character; Specifies the estimation method. For population
+models, options are: \code{"QRPEM"}, \code{"IT2S-EM"}, \code{"FOCE-LB"},
+\code{"FO"}, \code{"FOCE-ELS"}, \code{"Laplacian"}, and
+\code{"Naive-Pooled"}. For individual models, only \code{"Naive-Pooled"} is
+available. The default for population models depends on model
+characteristics:
 \itemize{
-\item If \code{model@hasResetInfo = TRUE}, then \code{sort} must be set to \code{FALSE} (default);
-\item Otherwise, the default value for \code{sort} is \code{TRUE}.
+  \item If the model includes discontinuous observed variables (e.g., count data),
+        Below Quantifiable Limit (BQL) data, or has no unfrozen sigmas, the default is \code{"Laplacian"}.
+  \item Otherwise, the default is \code{"FOCE-ELS"}.
 }}
 
-\item{ODE}{Character; Specifying the solver used to numerically solve
-Ordinary Differential Equations (ODEs). Options are `"MatrixExponent"`,
-`"Higham"`, `"DVERK"`, `"DOPRI5"`, `"AutoDetect"`, `"Stiff"`. See Details
-section.}
-
-\item{rtolODE}{Numeric; Specifying relative tolerance for the numerical ODE solver.}
-
-\item{atolODE}{Numeric; Specifying absolute tolerance for the numerical ODE solver.}
-
-\item{maxStepsODE}{Numeric; Specifying maximum number of allowable steps or function evaluations for the ODE solver.}
-
-\item{numIterations}{Numeric; Specifying maximum number of iterations for estimation.}
-
-\item{method}{Character; Specifying engine method for estimation. For population models,
-options are \code{"QRPEM"}, \code{"IT2S-EM"}, \code{"FOCE-LB"}, \code{"FO"},
-\code{"FOCE-ELS"}, \code{"Laplacian"}, \code{"Naive-Pooled"}.
-While, for individual models, \code{"Naive-Pooled"} is the only option.\cr
-
-Note: For population models, if \code{model} involves any discontinuous observed variable (e.g., count data) or BQL data,
-the default method is \code{"Laplacian"}; otherwise, the default method is \code{"FOCE-ELS"}.}
-
-\item{stdErr}{Character; Specifying method for standard error computations.  \cr
+\item{stdErr}{Character; Specifies the method for standard error
+computations. Options vary depending on the model type and estimation
+method:
 \itemize{
-\item For individual models, options are \code{"Hessian"} (default) and \code{"None"};
-\item For population models with \code{method = "QRPEM"}, options are \code{"Fisher-Score"} (default) and \code{"None"};
-\item For population models with \code{method = "IT2s-EM"}, the only option is \code{"None"};
-\item For population models with \code{method} set to either \code{"FOCE-LB"}, \code{"FO"},
-\code{"FOCE-ELS"}, \code{"Laplacian"}, or \code{"Naive-Pooled"}, options are \code{"Sandwich"} (default),
-\code{"Hessian"}, \code{"Fisher-Score"}, \code{"Auto-Detect"}, and \code{"None"}.
+  \item Individual models: \code{"Hessian"} (default) or \code{"None"}.
+  \item Population models with \code{method = "QRPEM"}: \code{"Fisher-Score"} (default) or \code{"None"}.
+  \item Population models with \code{method = "IT2S-EM"}: \code{"None"} only.
+  \item Population models with \code{method} in \code{c("FOCE-LB", "FO", "FOCE-ELS", "Laplacian", "Naive-Pooled")}:
+        \code{"Sandwich"} (default), \code{"Hessian"}, \code{"Fisher-Score"}, \code{"Auto-Detect"}, or \code{"None"}.
 }
-Here \code{"None"} means that standard error calculations are not performed.}
+\code{"None"} means that standard error calculations are not performed.}
 
-\item{isCentralDiffStdErr}{Logical; Default \code{TRUE} uses central difference for \code{stdErr} calculations.
-Set to \code{FALSE} for forward difference method.}
+\item{isCentralDiffStdErr}{Logical; If \code{TRUE} (default), uses central
+difference for standard error calculations when applicable. If
+\code{FALSE}, uses forward difference.}
 
-\item{stepSizeStdErr}{Numeric; Specifying the step size used for \code{stdErr} calculations.
-If not specified, 0.01 is used for population models and 0.001 for individual models.}
+\item{stepSizeStdErr}{Numeric; Specifies the relative step size used for the
+numerical computation of the Hessian matrix during standard error
+calculations. If not specified, a default value is used (0.001 for
+\code{"Naive-Pooled"} method, and 0.01 otherwise).}
 
-\item{numIntegratePtsAGQ}{Numeric; Specifying the number of integration points
-for adaptive Gaussian quadrature (AGQ) algorithm. Only applicable to population models with
- \code{method} set to either \code{"FOCE-ELS"} or \code{"Laplacian"}.}
+\item{logTransform}{Logical or NULL; Controls log-transformation behavior,
+  particularly for models with a LogAdditive residual error (e.g.,
+  C*exp(epsilon)). The internal engine parameter 'logtran' is set based on
+  this argument and specific model characteristics as detailed below.
+  \itemize{
+    \item \code{NULL} (default) or \code{TRUE}: When the model has exactly
+      one residual error model and it is LogAdditive, this setting enables
+      Log-Transform Both Sides (LTBS). In LTBS, predictions and observations
+      are log-transformed, and the model is fit in the log-domain. This
+      results in the internal `logtran` engine parameter being set to 1.
 
-\item{numIterNonParametric}{Numeric;  Specifying the number of iterations to perform non-parametric estimation.
-Only applicable to population models when \code{method} is not set to \code{Naive-Pooled}.}
+    \item \code{FALSE}: When the model has exactly one residual error model
+      and it is LogAdditive, this setting results in the LogAdditive error
+      being treated as a proportional/multiplicative error during fitting
+      (by neglecting third and higher-order terms in the Taylor expansion
+      of exp(epsilon)). This sets the internal `logtran` engine parameter
+      to 0. For simulation, the error is treated as exp(epsilon).
+  }
 
-\item{allowSyntheticGradient}{Logical, Set to \code{TRUE} to use synthetic gradient during the estimation process.
-Only applicable to population models when \code{method} is not set to \code{Naive-Pooled}.}
+  For other model configurations, the `logtran` parameter is determined as follows:
+  \itemize{
+    \item If there are multiple residual error models or no residual error
+      models, `logtran` is set to 0, irrespective of the `logTransform`
+      value. (In the case of multiple errors, any LogAdditive errors present
+      are treated as proportional).
+    \item If there is a single residual error model that is not LogAdditive:
+      \itemize{
+        \item For built-in models: `logtran` is set to 0.
+        \item For textual models: `logtran` reflects the `logTransform`
+          setting (it becomes 1 if `logTransform` is `NULL` or `TRUE`, and
+          0 if `logTransform` is `FALSE`). A warning is issued if
+          `logTransform` is `NULL` or `TRUE` in this scenario, highlighting
+          that LTBS is typically for LogAdditive errors and that error type
+          identification can be challenging in textual models.
+      }
+  }}
 
-\item{numIterMAPNP}{Numeric; Specifying the number of iterations
-to perform Maximum A Posterior (MAP) initial Naive Pooling (NP) run before estimation.
-Only applicable to population models when \code{method} is not set to \code{Naive-Pooled}.}
+\item{numIntegratePtsAGQ}{Integer; Specifies the number of quadrature points
+  per dimension to use for Adaptive Gaussian Quadrature (AGQ). Only
+  applicable to population models when \code{method} is \code{"FOCE-ELS"} or
+  \code{"Laplacian"}.
+\itemize{
+  \item 1: Standard FOCE-ELS/LAPLACIAN computation (no AGQ).
+  \item >1: AGQ is performed.  The total number of quadrature points used is \code{(number of ETAs)^numIntegratePtsAGQ}.
+}}
 
-\item{numRepPCWRES}{Numeric; Specifying the number of replicates to generate the PCWRES
-after the simple estimation. Only applicable to population models when \code{method} is not set to \code{Naive-Pooled}.}
+\item{numIterNonParametric}{Integer; Controls non-parametric (NP)
+optimization.
+\itemize{
+  \item 0: Disables NP optimization.
+  \item 1: Enables NONMEM-style NP optimization using posthoc estimates as support points.
+  \item >1: Enables an evolutionary NP algorithm, using \code{numIterNonParametric} as the number of generations.
+}
+Only applicable to population models when \code{method} is not
+\code{"Naive-Pooled"}.}
 
-\item{stepSizeLinearize}{Numeric; Specifying the step size used for numerical differentiation
-when linearizing the model function during the estimation process.}
+\item{allowSyntheticGradient}{Deprecated.}
 
-\item{numDigitLaplacian}{Numeric; Specifying the number of significant decimal digits for the Laplacian algorithm
-to use to reach convergence. Only applicable to population models.}
+\item{fastOptimization}{Logical; Controls the differentiation method used
+during the optimization of random effects (etas). If \code{TRUE}, automatic
+differentiation is used where possible. If \code{FALSE}, a finite
+difference approach is used. Only applicable to population models when
+\code{method} is \code{"FOCE-ELS"} or \code{"Laplacian"}.}
 
-\item{numDigitBlup}{Numeric; Specifying the number of significant decimal digits for the individual estimation
-to use to reach convergence. Only applicable to population models.}
+\item{numIterMAPNP}{Integer; Specifies the number of iterations for a
+preliminary Naive-Pooled (NP) optimization run before the main estimation.
+Applicable when the \code{method} is not \code{"NAIVE-POOLED"}.}
 
-\item{mapAssist}{Numeric; Specifying the period used to perform MAP assistance (\code{mapAssist = 0} means that
-MAP assistance is not performed). Only applicable to population models with \code{method = "QRPEM"}.}
+\item{numRepPCWRES}{Integer; Specifies the number of replicates to generate
+for Population Conditional Weighted Residuals (PCWRES) calculations.
+Setting this value to 0 disables PCWRES computation.  Only applicable to
+population models when method is not set to \code{"Naive-Pooled"}.}
 
-\item{iSample}{Numeric; Specifying the number of samples. Only applicable to population models with \code{method = "QRPEM"}.}
+\item{stepSizeLinearize}{Numeric; Specifies the relative step size for
+numerical differentiation during model linearization.}
 
-\item{iAcceptRatio}{Numeric; Specifying the acceptance ratio. Only applicable to population models with \code{method = "QRPEM"}.}
+\item{numDigitLaplacian}{Numeric; Specifies the optimization accuracy
+(NDIGIT) for the outer loop (thetas and sigmas) when using
+\code{"FOCE-ELS"} or \code{"Laplacian"} methods. Only applicable to
+population models.}
 
-\item{impDist}{Character; Specifying the distribution used for important sampling, and options are
-\code{"Normal"} (default), \code{"DoubleExponential"}, \code{"Direct"}, \code{"T"}, \code{"Mixture-2"}, \code{Mixture-3}.
-Only applicable to population models with \code{method = "QRPEM"}.}
+\item{numDigitBlup}{Numeric; Specifies the optimization accuracy (NDIGIT) for
+the inner loop (optimization of etas). Also applies to the single
+optimization loop in the \code{"NAIVE-POOLED"} method.}
 
-\item{tDOF}{Numeric; Specifing the degree of freedom (allowed value is between 3 and 30) for T distribution.
-Only applicable to population models with \code{method = "QRPEM"} and \code{impDist = "T"}.}
+\item{gradTolOuter}{Numeric; maximum gradient tolerance for the outer loop
+(Theta/Omega/Sigma optimization) of "FOCE-ELS" or "Laplacian" method.
+This tolerance controls how close the gradient must be to zero before the
+outer optimization is considered converged.}
 
-\item{numSampleSIR}{Numeric; Specifying the number of samples per subject used
-in the Sampling Importance Re-Sampling (SIR) algorithm to determine the number of SIR samples
-taken from the empirical discrete distribution that approximates the target conditional distribution.
-Only applicable to population models with \code{method = "QRPEM"}.}
+\item{stepTolOuter}{Numeric; maximum step tolerance for the outer loop
+(Theta/Omega/Sigma optimization) of "FOCE-ELS" or "Laplacian" method.
+This measures the relative change in the solution vector between iterations.}
 
-\item{numBurnIn}{Numeric; Specifying the number of burn-in iterations to perform at startup
-to adjust certain internal parameters. Only applicable to population models with \code{method = "QRPEM"}.}
+\item{gradTolInner}{Numeric; maximum gradient tolerance for the inner loop
+(Eta optimization) of "FOCE-ELS" or "Laplacian" method. A smaller value
+forces the algorithm to iterate until a very small gradient is achieved.}
 
-\item{freezeOmega}{Logical; Set to \code{TRUE} to freeze Omega but not Theta for the number of iterations
-specified in the \code{numBurnIn}. Only applicable to population models with \code{method = "QRPEM"}.}
+\item{stepTolInner}{Numeric; maximum step tolerance for the inner loop (Eta
+optimization) of "FOCE-ELS" or "Laplacian" method. This determines when
+the algorithm will terminate based on minimal changes in the solution vector.}
 
-\item{MCPEM}{Logical; Set to \code{TRUE} to use Monte-Carlo sampling instead of Quasi-Random.
-Only applicable to population models with \code{method = "QRPEM"}.}
+\item{refDeltaLagl}{Numeric; tolerance for the change in the log-likelihood
+(LL) value during outer loop optimization of "FOCE-ELS" or "Laplacian" method.
+This parameter is used to check convergence by comparing the absolute change
+in LL between major iterations. If the change in LL is less than refDeltaLagl
+and the optimization driver returns a specific termination code, the algorithm
+considers the solution sufficiently converged. This tolerance helps to
+avoid unnecessary iterations when improvements in LL become marginal.}
 
-\item{runAllIterations}{Logical; Set to \code{TRUE} to execute all requested iterations specified in \code{numIterations}.
-Only applicable to population models with \code{method = "QRPEM"}.}
+\item{mapAssist}{Numeric; Controls the use of MAP assistance in the QRPEM
+  algorithm.
+\itemize{
+  \item 0: No MAP assistance.
+  \item >0: The inner ETAs optimization loop is used in the QRPEM outer
+   optimization loop with a periodicity equal to the value of \code{mapAssist}.
+}
+  Only applicable to population models with \code{method = "QRPEM"}.}
 
-\item{scramble}{Character; Specifying the quasi-random scrambling method to use,
-and options are \code{"Owen"}, \code{"Tezuka-Faur"}, or \code{"None"}.
-Only applicable to population models with \code{method = "QRPEM"}.}
+\item{iSample}{Numeric; Specifies the number of sample points used in the
+QRPEM algorithm. Only applicable to population models with \code{method =
+"QRPEM"}.}
 
-\item{stepSizePartialDeriv}{Numeric; Specifying the step size used to numerically calculate the partial derivatives
-of observed variables with respect to parameters. Only applicable to individual models.}
+\item{iAcceptRatio}{Numeric; Specifies the acceptance ratio used in the QRPEM
+algorithm for scaling the covariance matrix. Only applicable to population
+models with \code{method = "QRPEM"}.}
 
-\item{numTimeStepPartialDeriv}{Numeric; Specifying the number of time steps used to output the partial derivatives
-of observed variables with respect to parameters. Only applicable to individual models.}
+\item{impDist}{Character; Specifies the importance sampling distribution used
+in the QRPEM algorithm. Options are: \code{"Normal"},
+\code{"DoubleExponential"}, \code{"Direct"}, \code{"T"},
+\code{"Mixture-2"}, \code{"Mixture-3"}. Only applicable to population
+models with \code{method = "QRPEM"}.  See Details for further information.}
+
+\item{tDOF}{Numeric; Specifies the degrees of freedom for the multivariate T
+distribution used in importance sampling. Only applicable when \code{method
+= "QRPEM"} and \code{impDist = "T"}.  Must be between 3 and 30.}
+
+\item{numSampleSIR}{Numeric; Specifies the number of samples per eta per
+subject used in the Sampling Importance Resampling (SIR) algorithm within
+QRPEM. Only applicable to population models with \code{method = "QRPEM"}.}
+
+\item{numBurnIn}{Numeric; Specifies the number of burn-in iterations in the
+QRPEM algorithm. During burn-in, omegas can be frozen (see
+\code{freezeOmega} parameter). Only applicable to population models with
+\code{method = "QRPEM"}.}
+
+\item{freezeOmega}{Logical; Set to \code{TRUE} to freeze Omega but not Theta
+for the number of iterations specified in the \code{numBurnIn}. Only
+applicable to population models with \code{method = "QRPEM"}.}
+
+\item{MCPEM}{Logical; Controls the sampling method used in the QRPEM
+  algorithm.
+\itemize{
+  \item \code{FALSE}: Quasi-Random sampling.
+  \item \code{TRUE}: Monte-Carlo sampling.
+}
+  Only applicable to population models with \code{method = "QRPEM"}.}
+
+\item{runAllIterations}{Logical; Set to \code{TRUE} to execute all requested
+iterations specified in \code{numIterations}. Only applicable to population
+models with \code{method = "QRPEM"}.}
+
+\item{scramble}{Character; Specifies the scrambling method for quasi-random
+number generation in the QRPEM algorithm. Options are: \code{"None"},
+\code{"Owen"}, \code{"Faure-Tezuka"}. Only applicable to population models
+with \code{method = "QRPEM"}.}
+
+\item{emTolType}{Numeric; QRPEM convergence check type. Options:
+\itemize{
+  \item 0: Default (no rollout, LL & Theta and Sigma).
+  \item 1: LL & All Population Params (Theta, Omega, and Sigma) with rollout.
+  \item 2: LL with rollout.
+  \item 3: All Population Params with rollout.
+}
+Only applicable to population models with method = "QRPEM".}
+
+\item{emConvLen}{Numeric; number of iterations over which convergence is
+checked in the QRPEM method. Only applicable to population models with
+method = "QRPEM" and emTolType being nonzero.}
+
+\item{emConvCritVal}{Numeric; critical value used in the QRPEM convergence
+check. It specifies the threshold improvement required to continue iterating.
+Only applicable to population models with method = "QRPEM" and emTolType
+being nonzero.}
+
+\item{stepSizePartialDeriv}{Numeric; Specifying the step size used to
+numerically calculate the partial derivatives of observed variables with
+respect to parameters. Only applicable to individual models.}
+
+\item{numTimeStepPartialDeriv}{Numeric; Specifying the number of time steps
+used to output the partial derivatives of observed variables with respect
+to parameters. Only applicable to individual models.}
 }
 \value{
 List of engine parameters to be used during fitting or simulation
 }
 \description{
-Use to define extra engine parameters for model execution.
+Use to define engine parameters for model execution.
 }
 \details{
-Both `"DVERK"` and `"DOPRI5"` are non-stiff solvers. `"Higham"` is a matrix
-exponent based ODE solver which could be useful when overscaling issue should
-be avoided, i.e. the ratio between observed values and doses is too high or
-too low. `"AutoDetect"` represents LSODA solver implemenation, which solves
-the initial value problem for stiff or nonstiff systems of first order
-ordinary differential equations. `"Stiff"` is a LSODE (Livermore solver). It
-is best suited for stiff problems.
+Both \code{"DVERK"} and \code{"DOPRI5"} are non-stiff solvers.
+\code{"AutoDetect"} represents LSODA solver implemenation, which solves the
+initial value problem for stiff or nonstiff systems of first order ordinary
+differential equations. \code{"Stiff"} is a LSODE (Livermore solver). It is
+best suited for stiff problems. \code{"MatrixExponent"} is a matrix
+exponential solver.
+
+For the QRPEM method, the \code{impDist} parameter controls the importance
+sampling distribution.  The \code{ximpsampdof} slot in the internal
+\code{NlmeEngineExtraParams} object is set based on \code{impDist} as
+follows:
+\itemize{
+ \item \code{"Normal"}: \code{ximpsampdof} = 0
+ \item \code{"DoubleExponential"}: \code{ximpsampdof} = 1
+ \item \code{"Direct"}: \code{ximpsampdof} = 2
+ \item \code{"T"}: \code{ximpsampdof} is set to the value of \code{tDOF}.
+ \item \code{"Mixture-2"}: \code{ximpsampdof} = -2
+ \item \code{"Mixture-3"}: \code{ximpsampdof} = -3
+}
 }

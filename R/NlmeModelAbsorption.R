@@ -30,6 +30,7 @@ InverseGaussian <- 5
 #' \donttest{
 #' NlmeModelAbsorption(PARAM_EXTRAVASCULAR)
 #' }
+#' @noRd
 #' @keywords internal
 setClass(
   "NlmeModelAbsorption",

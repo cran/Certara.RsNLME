@@ -11,24 +11,28 @@
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
 #' \donttest{
-#' # Create initial model
 #' model <- pkmodel(
 #'   parameterization = "Clearance",
-#'   absorption = "Intravenous",
 #'   numCompartments = 2,
 #'   data = pkData,
 #'   ID = "Subject",
+#'   Time = "Act_Time",
 #'   A1 = "Amount",
 #'   CObs = "Conc",
-#'   Time = "Act_Time",
-#'   modelName = "pk_model"
-#' )
+#'   workingDir = tempdir()
+#'   )
+#'  host <- hostParams(sharedDirectory = tempdir(),
+#'                     parallelMethod = "None",
+#'                     hostName = "local",
+#'                     numCores = 1)
+#' job <- fitmodel(model,
+#'                 numIterations = 3,
+#'                 hostPlatform = host)
 #'
-#' # Fit Model
-#' job <- fitmodel(model)
-#'
-#' # Copy model and accept all effects from the original model run
-#' vpcModel <- copyModel(model, acceptAllEffects = TRUE, modelName = "vpc_model")
+#' finalModelVPC <- copyModel(model,
+#'                            acceptAllEffects = TRUE,
+#'                            modelName = "model_VPC",
+#'                            workingDir = tempdir())
 #' }
 #'
 #' @export
