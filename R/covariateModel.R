@@ -8,7 +8,7 @@
 #' @return CovariateEffectModel class object
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Define the model
 #' model <- pkmodel(
 #'   numCompartments = 2,

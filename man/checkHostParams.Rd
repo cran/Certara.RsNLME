@@ -16,7 +16,7 @@ checkHostParams(obj, verbose = FALSE)
 Checks NLME Parallel Host object for correct settings for GCC, NLME Installation, MPI and Root directories.
 }
 \examples{
-\donttest{
+\dontrun{
 
 # multicore
 multicoreHost <- hostParams(

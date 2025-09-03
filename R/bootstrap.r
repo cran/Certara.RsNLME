@@ -27,7 +27,7 @@
 #' @seealso \code{\link{hostParams}, \link{engineParams}, \link{BootstrapParams}}
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' input_data <- pkData
 #'
 #' model <-

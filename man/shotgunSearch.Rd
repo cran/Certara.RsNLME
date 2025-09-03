@@ -46,7 +46,7 @@ Otherwise the \code{ShotgunNlmeJob} class object is returned.
 Executes an NLME shotgun covariate search
 }
 \examples{
-\donttest{
+\dontrun{
 # Define the model
 model <- pkmodel(numCompartments = 2,
                  data = pkData,

@@ -17,7 +17,7 @@
 #' @seealso \code{\link{hostParams}, \link{engineParams}}
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Define the model
 #' model <- pkmodel(numCompartments = 1,
 #'                  data = pkData,

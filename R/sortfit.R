@@ -21,7 +21,7 @@
 #' \link{NlmeScenario}, \link{tableParams}}
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' input_data <- pkData
 #'
 #' model <-

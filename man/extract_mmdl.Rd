@@ -47,7 +47,7 @@ irrespective of the simulation blocks presence, all simulation blocks
 are going next.
 }
 \examples{
-\donttest{
+\dontrun{
 # path to metamodel should be specified, all other arguments set to default
 extract_mmdl(system.file("extdata/mmdlNoTime", "test.mmdl",
                               package = "Certara.RsNLME"),

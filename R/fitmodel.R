@@ -94,7 +94,7 @@
 #' \link{engineParams}}
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'
 #'  # Define the host
 #'  host <- hostParams(sharedDirectory = tempdir(),

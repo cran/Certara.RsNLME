@@ -36,7 +36,7 @@ initializing directly.}
 Class initializer for arguments of visual predictive check (VPC) runs
 }
 \examples{
-\donttest{
+\dontrun{
 model <- pkmodel(
   parameterization = "Clearance",
   numCompartments = 2,

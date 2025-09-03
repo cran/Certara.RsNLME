@@ -41,7 +41,7 @@ the results of previous estimation are applied to the model before the next one.
 ESTARGS queue is executed first, SIMARGS queue is executed the second.
 }
 \examples{
-\donttest{
+\dontrun{
 mmdlfile <- system.file("extdata/mmdlNoTime/test.mmdl",
                        package = "Certara.RsNLME",
                        mustWork = TRUE)

@@ -5,7 +5,7 @@
 #' @param model    PK/PD model
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' model <- emaxmodel(
 #'   checkBaseline = TRUE,
 #'   checkFractional = TRUE,

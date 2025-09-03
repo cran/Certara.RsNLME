@@ -52,7 +52,7 @@ it returns the full paths of the tables generated}}
 Perform visual predictive check for NLME models
 }
 \examples{
-\donttest{
+\dontrun{
 model <- pkmodel(
   numComp = 1,
   absorption = "Extravascular",

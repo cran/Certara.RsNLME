@@ -16,7 +16,7 @@ Character. Job status messages.
 Reads progress file and returns the status of a job
 }
 \examples{
-\donttest{
+\dontrun{
   model <- pkmodel(
     parameterization = "Clearance",
     numCompartments = 2,

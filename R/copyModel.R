@@ -10,7 +10,7 @@
 #'
 #' @return Modified \code{NlmePmlModel} object
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' model <- pkmodel(
 #'   parameterization = "Clearance",
 #'   numCompartments = 2,

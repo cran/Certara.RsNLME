@@ -18,7 +18,7 @@ List of model information
 Calls TDL5 to parse the model and get the list of terms
 }
 \examples{
-\donttest{
+\dontrun{
   model <- pkmodel(columnMap = FALSE,
                    workingDir = tempdir())
   createModelInfo(model)

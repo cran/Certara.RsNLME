@@ -36,7 +36,7 @@ List of results from NLME execution.
 Executes an NLME profile perturbation
 }
 \examples{
-\donttest{
+\dontrun{
   model <- pkmodel(
     parameterization = "Clearance",
     numCompartments = 2,

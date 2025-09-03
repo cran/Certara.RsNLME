@@ -28,7 +28,7 @@ specified by the `CAD_CONFIG_FILE` environment variable, runs the licensing
 tool to log out the user, and attempts to remove the NLME license.
 }
 \examples{
-\donttest{
+\dontrun{
 INSTALLDIR <- Sys.getenv("INSTALLDIR")
 if (INSTALLDIR == "") INSTALLDIR <- "C:/Program Files/Certara/NLME_Engine"
 if (FALSE) { # to prevent unintended logout

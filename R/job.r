@@ -40,7 +40,7 @@ downloadFileWithCat <- function(job, filename) {
 #' @param job NLME job object
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   model <- pkmodel(
 #'     parameterization = "Clearance",
 #'     numCompartments = 2,

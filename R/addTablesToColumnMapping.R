@@ -8,7 +8,7 @@
 #' @param forSim      Logical; Set to \code{TRUE} if simulation tables are provided
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' addTablesToColumnMapping(model, simParams, Tables, filename)
 #' }
 #'

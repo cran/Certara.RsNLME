@@ -22,7 +22,7 @@ set_Xchmod <- function() {
 #' @param ForceRun Set to \code{TRUE} to force run
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   model <- pkmodel(columnMap = FALSE,
 #'                    workingDir = tempdir())
 #'   createModelInfo(model)

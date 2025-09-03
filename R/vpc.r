@@ -28,7 +28,7 @@
 #' the list returned will have just the full paths of the tables generated.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' SimTableObs <- tableParams(
 #'   name = "SimTableObs.csv",
 #'   timesList = "0,1,2,4,4.9,55.1,56,57,59,60",
@@ -153,7 +153,7 @@ simmodel <- function(model,
 #' it returns the full paths of the tables generated}}
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' model <- pkmodel(
 #'   numComp = 1,
 #'   absorption = "Extravascular",
@@ -497,7 +497,7 @@ setMethod("initialize", "NlmeObservationVar",
 #'
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' model <- pkmodel(
 #'   parameterization = "Clearance",
 #'   numCompartments = 2,

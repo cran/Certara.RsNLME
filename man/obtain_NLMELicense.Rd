@@ -43,7 +43,7 @@ This function checks for the presence of the necessary
   parameter is set to \code{TRUE}.
 }
 \examples{
-\donttest{
+\dontrun{
 INSTALLDIR <- Sys.getenv("INSTALLDIR")
 if (INSTALLDIR == "") INSTALLDIR <- "C:/Program Files/Certara/NLME_Engine"
 result <- obtain_NLMELicense(INSTALLDIR, verbose = TRUE)

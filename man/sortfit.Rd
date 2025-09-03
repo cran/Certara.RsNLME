@@ -135,7 +135,7 @@ The non-loaded but returned files in the model working directory are:
 }
 
 \examples{
-\donttest{
+\dontrun{
 input_data <- pkData
 
 model <-

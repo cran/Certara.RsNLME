@@ -19,7 +19,7 @@ execution. Use \code{\link{copyModel}} and set argument
 estimates from base model run.
 }
 \examples{
-\donttest{
+\dontrun{
 # Define the model
 model <- pkmodel(numComp = 1,
                  absorption = "Intravenous",

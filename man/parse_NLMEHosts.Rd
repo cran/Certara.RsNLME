@@ -19,7 +19,7 @@ the \code{NlmeParallelHost} class object is returned.
 Create NlmeParallelHost object from json file with host definition
 }
 \examples{
-\donttest{
+\dontrun{
 # path nlme_hostPath should be specified
  nlme_hostPath <- tempfile()
  host1 <- paste0('{"profile_name":"Multicore",',

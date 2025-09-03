@@ -16,7 +16,7 @@ Character vector of theta names defined in model
 Returns named character vector of theta values by parsing PML fixed effect statements
 }
 \examples{
-\donttest{
+\dontrun{
 model <- emaxmodel(
   checkBaseline = TRUE,
   checkFractional = TRUE,

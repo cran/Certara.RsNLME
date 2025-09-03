@@ -130,7 +130,7 @@ The non-loaded but returned files in the model working directory are:
 }
 
 \examples{
-\donttest{
+\dontrun{
 
  # Define the host
  host <- hostParams(sharedDirectory = tempdir(),

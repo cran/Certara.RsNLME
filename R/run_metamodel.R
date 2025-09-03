@@ -30,7 +30,7 @@
 #' ESTARGS queue is executed first, SIMARGS queue is executed the second.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' mmdlfile <- system.file("extdata/mmdlNoTime/test.mmdl",
 #'                        package = "Certara.RsNLME",
 #'                        mustWork = TRUE)
@@ -201,7 +201,7 @@ run_metamodel <-
 #' @return
 #' the \code{NlmeParallelHost} class object is returned.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # path nlme_hostPath should be specified
 #'  nlme_hostPath <- tempfile()
 #'  host1 <- paste0('{"profile_name":"Multicore",',

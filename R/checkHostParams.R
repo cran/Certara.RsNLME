@@ -5,7 +5,7 @@
 #' @param obj NLME Parallel Host to be checked
 #' @return \code{TRUE} if all checks are successful, otherwise \code{FALSE}
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'
 #' # multicore
 #' multicoreHost <- hostParams(

@@ -50,7 +50,7 @@ the list returned will have just the full paths of the tables generated.
 Executes an NLME simulation
 }
 \examples{
-\donttest{
+\dontrun{
 SimTableObs <- tableParams(
   name = "SimTableObs.csv",
   timesList = "0,1,2,4,4.9,55.1,56,57,59,60",

@@ -39,7 +39,7 @@ Object of class \code{ProfileNlmeJob}
 Execute an NLME profile perturbation
 }
 \examples{
-\donttest{
+\dontrun{
   model <- pkmodel(
     parameterization = "Clearance",
     numCompartments = 2,

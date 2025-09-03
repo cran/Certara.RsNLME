@@ -41,7 +41,7 @@ getProfilesString <- function(profiles) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   model <- pkmodel(
 #'     parameterization = "Clearance",
 #'     numCompartments = 2,
@@ -135,7 +135,7 @@ profilePertubate <- function(hostPlatform,
 #' @param  workingDir Directory in which to run the job. Current working directory is used if \code{NULL}
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   model <- pkmodel(
 #'     parameterization = "Clearance",
 #'     numCompartments = 2,

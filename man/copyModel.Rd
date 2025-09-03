@@ -23,7 +23,7 @@ Copies previously executed model into a new object and optionally accept all est
 A new working directory is created and all files from base model are copied into it.
 }
 \examples{
-\donttest{
+\dontrun{
 model <- pkmodel(
   parameterization = "Clearance",
   numCompartments = 2,

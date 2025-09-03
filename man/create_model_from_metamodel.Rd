@@ -26,7 +26,7 @@ NlmePmlModel model class from the given parsed metamodel. See
 overview}.
 }
 \examples{
- \donttest{
+ \dontrun{
    ModelParamsList <-
      create_model_from_metamodel(
        mmdlfile = system.file("extdata/mmdlNoTime", "test.mmdl",

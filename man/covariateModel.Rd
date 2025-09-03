@@ -17,7 +17,7 @@ Use to create set of covariate effects to be checked during Stepwise or Shotgun
 covariate search
 }
 \examples{
-\donttest{
+\dontrun{
 # Define the model
 model <- pkmodel(
   numCompartments = 2,

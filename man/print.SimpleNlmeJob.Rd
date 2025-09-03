@@ -19,7 +19,7 @@ Reads progress file and prints out its contents.
 Applicable to remote jobs or jobs running in backgroud.
 }
 \examples{
-\donttest{
+\dontrun{
 model <- pkmodel(
   parameterization = "Clearance",
   numCompartments = 2,

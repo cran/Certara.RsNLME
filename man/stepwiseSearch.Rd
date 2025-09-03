@@ -49,7 +49,7 @@ Otherwise the \code{StepwiseNlmeJob} class object is returned.
 Executes an NLME stepwise covariate search
 }
 \examples{
-\donttest{
+\dontrun{
 # Define the model
 model <- pkmodel(numCompartments = 1,
                  data = pkData,

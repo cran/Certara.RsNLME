@@ -485,7 +485,7 @@
 #' @seealso [run_metamodel()]
 #'
 #' @examples
-#'  \donttest{
+#'  \dontrun{
 #'    ModelParamsList <-
 #'      create_model_from_metamodel(
 #'        mmdlfile = system.file("extdata/mmdlNoTime", "test.mmdl",

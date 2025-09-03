@@ -577,7 +577,7 @@ setMethod(
 #' @inheritParams ellipsis::dots_used
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' model <- pkmodel(
 #'   parameterization = "Clearance",
 #'   numCompartments = 2,

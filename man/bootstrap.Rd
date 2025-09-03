@@ -47,7 +47,7 @@ Otherwise the \code{BootNlmeJob} class object is returned.
 Method to execute an NLME Bootstrap
 }
 \examples{
-\donttest{
+\dontrun{
 input_data <- pkData
 
 model <-

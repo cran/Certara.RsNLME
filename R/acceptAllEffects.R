@@ -8,7 +8,7 @@
 #' @param model Model object
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Define the model
 #' model <- pkmodel(numComp = 1,
 #'                  absorption = "Intravenous",
