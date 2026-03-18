@@ -151,6 +151,11 @@ setMethod(
 
 .execute_remote <- function(.Object) {
   Certara.NLME8::checkInstallDir(Sys.getenv("INSTALLDIR"))
+  .ensure_remote_dir_exists_or_stop(
+    session = .Object@host@remoteExecutor@session,
+    dirPath = .Object@host@installationDirectory
+  )
+
   # need to check NLME Engine files
   LinuxExecsGeneral <- c("TDL5",
                          "cadlicensingtool")
@@ -169,18 +174,25 @@ setMethod(
     "libLAPACK_linux.a",
     "libMPI_STUB_linux.a",
     "libNLME7_FORT_linux.a",
-    "libNLME7_linux.a",
-    "libcrlibm_linux.a",
-    "libcadlicensingclient.so.0.1.0"
+    "libNLME7_linux.a"
   )
 
-  LinuxLibs <-
+  LinuxLibsFixed <-
     list.files(
       path = Sys.getenv("INSTALLDIR"),
       pattern = paste0("^", LinuxLibs, "$", collapse = "|"),
       full.names = TRUE,
       recursive = TRUE
     )
+
+  LinuxLibsVersioned <- list.files(
+    path = Sys.getenv("INSTALLDIR"),
+    pattern = "libcadlicensingclient\\.so\\.[0-9]+\\.[0-9]+\\.[0-9]+$",
+    full.names = TRUE,
+    recursive = TRUE
+  )
+
+  LinuxLibs <- unique(c(LinuxLibsFixed, LinuxLibsVersioned))
 
   requiredScripts <- list.files(
     path = Sys.getenv("INSTALLDIR"),
@@ -218,34 +230,28 @@ setMethod(
     paste("if",
           Request,
           "; then echo TRUE; else echo FALSE; fi")
-  stat <-
-    ssh::ssh_exec_internal(.Object@host@remoteExecutor@session,
-                           Request)
-
-  .check_SSHExecStatusDir(
-    CreateRetValue = stat,
+  stat <- .ssh_exec_internal_warn(
+    session = .Object@host@remoteExecutor@session,
+    command = Request,
     relativePath = "",
     .Object = .Object
   )
 
   if (rawToChar(stat$stdout) == "FALSE\n") {
     message(
-      "A directory ",
+      "Required NLME Engine files are missing under ",
       .Object@host@installationDirectory,
-      " not found on the server.",
-      "\nWill try to create it."
+      " on the server.",
+      "\nWill try to create/update the remote installation directory."
     )
 
     # creating InstallDirNLME and subfolders
-    CreateInstallDir <-
-      ssh::ssh_exec_internal(.Object@host@remoteExecutor@session,
-                             paste0(
-                               "mkdir -p ",
-                               shQuote(.Object@host@installationDirectory, type = "sh")
-                             ))
-
-    .check_SSHExecStatusDir(
-      CreateRetValue = CreateInstallDir,
+    .ssh_exec_internal_warn(
+      session = .Object@host@remoteExecutor@session,
+      command = paste0(
+        "mkdir -p ",
+        shQuote(.Object@host@installationDirectory, type = "sh")
+      ),
       relativePath = "",
       .Object = .Object
     )
@@ -254,25 +260,23 @@ setMethod(
       requiredFilesCurrentDir <-
         requiredFilesWOInstalldir[dirname(requiredFilesWOInstalldir) == Directory]
       if (!Directory %in% c(".", "/")) {
-        CreateDirectory <-
-          ssh::ssh_exec_internal(.Object@host@remoteExecutor@session,
-                                 paste0("mkdir -p ",
-                                        shQuote(
-                                          file.path(.Object@host@installationDirectory, Directory),
-                                          type = "sh"
-                                        )))
-
-        .check_SSHExecStatusDir(
-          CreateRetValue = CreateDirectory,
+        .ssh_exec_internal_warn(
+          session = .Object@host@remoteExecutor@session,
+          command = paste0("mkdir -p ",
+                           shQuote(
+                             file.path(.Object@host@installationDirectory, Directory),
+                             type = "sh"
+                           )),
           relativePath = Directory,
           .Object = .Object
         )
       }
 
-      ret <- uploadFiles(
+      .uploadFiles_warn(
         .Object = .Object@host@remoteExecutor,
         remoteDir = file.path(.Object@host@installationDirectory, Directory),
-        files = file.path(Sys.getenv("INSTALLDIR"), requiredFilesCurrentDir)
+        files = file.path(Sys.getenv("INSTALLDIR"), requiredFilesCurrentDir),
+        contextPath = file.path(.Object@host@installationDirectory, Directory)
       )
     }
 
@@ -287,8 +291,12 @@ setMethod(
     )
 
     for (cmd in cmds) {
-      stat <-
-        ssh::ssh_exec_internal(.Object@host@remoteExecutor@session, cmd)
+      stat <- .ssh_exec_internal_warn(
+        session = .Object@host@remoteExecutor@session,
+        command = cmd,
+        relativePath = "",
+        .Object = .Object
+      )
     }
 
   }
@@ -315,37 +323,69 @@ setMethod(
       list.files(LicenseFilesPath, full.names = TRUE)
 
     RemoteAuthPath <- "~/.certara/auth/wnl/"
-    CreateDirectory <-
-      ssh::ssh_exec_internal(.Object@host@remoteExecutor@session,
-                             paste("mkdir -p", RemoteAuthPath))
-
-    .check_SSHExecStatusDir(
-      CreateRetValue = CreateDirectory,
-      relativePath = Directory,
+    .ssh_exec_internal_warn(
+      session = .Object@host@remoteExecutor@session,
+      command = paste("mkdir -p", RemoteAuthPath),
+      relativePath = "",
+      targetPath = RemoteAuthPath,
       .Object = .Object
     )
 
     # need to get the absolute path
-    stat <-
-      ssh::ssh_exec_internal(
-        .Object@host@remoteExecutor@session,
-        paste("realpath", RemoteAuthPath)
+    stat <- .ssh_exec_internal_warn(
+      session = .Object@host@remoteExecutor@session,
+      command = paste("realpath", RemoteAuthPath),
+      relativePath = "",
+      targetPath = RemoteAuthPath,
+      .Object = .Object
+    )
+
+    RemoteAuthPathCandidate <- ""
+    if (!is.null(stat$stdout) && length(stat$stdout) > 0L) {
+      RemoteAuthPathCandidate <- gsub("\n", "", rawToChar(stat$stdout))
+    }
+
+    if (!is.null(stat$status) && stat$status != 0L) {
+      warning(
+        "Failed to resolve remote auth path with realpath; ",
+        "SSH command exited with status ",
+        stat$status,
+        ". Falling back to configured path ",
+        RemoteAuthPath,
+        ".",
+        call. = FALSE,
+        immediate. = TRUE
       )
+    } else if (!nzchar(RemoteAuthPathCandidate)) {
+      warning(
+        "Failed to resolve remote auth path with realpath; no valid path was returned. ",
+        "Falling back to configured path ",
+        RemoteAuthPath,
+        ".",
+        call. = FALSE,
+        immediate. = TRUE
+      )
+    } else {
+      RemoteAuthPath <- RemoteAuthPathCandidate
+    }
 
-    RemoteAuthPath <- gsub("\n", "", rawToChar(stat$stdout))
-
-    ret <- uploadFiles(
+    .uploadFiles_warn(
       .Object = .Object@host@remoteExecutor,
       remoteDir = RemoteAuthPath,
-      files = LicenseFiles
+      files = LicenseFiles,
+      contextPath = RemoteAuthPath
     )
   }
 
   files <- getFilesToTransfer(.Object@localDir, .Object@argsFile)
   allFiles <- c(files, .Object@scriptFile, .Object@argsFile)
   # uploading files required for the model run
-  stat <-
-    uploadFiles(.Object@host@remoteExecutor, .Object@remoteDir, allFiles)
+  stat <- .uploadFiles_warn(
+    .Object = .Object@host@remoteExecutor,
+    remoteDir = .Object@remoteDir,
+    files = allFiles,
+    contextPath = .Object@remoteDir
+  )
   scriptFileFullPath <-
     file.path(.Object@remoteDir, basename(.Object@scriptFile))
 
@@ -361,8 +401,13 @@ setMethod(
   )
 
   for (cmd in cmds) {
-    stat <-
-      ssh::ssh_exec_internal(.Object@host@remoteExecutor@session, cmd)
+    stat <- .ssh_exec_internal_warn(
+      session = .Object@host@remoteExecutor@session,
+      command = cmd,
+      relativePath = "",
+      targetPath = .Object@remoteDir,
+      .Object = .Object
+    )
   }
 
   if (.Object@runInBackground == FALSE) {
@@ -378,24 +423,108 @@ setMethod(
 }
 
 .check_SSHExecStatusDir <-
-  function(CreateRetValue, relativePath, .Object) {
+  function(CreateRetValue, relativePath, .Object, targetPath = NULL) {
+    if (is.null(targetPath)) {
+      targetPath <- file.path(.Object@host@installationDirectory, relativePath)
+    }
     if (CreateRetValue$status != 0 ||
         length(CreateRetValue$stderr) != 0) {
-      message(
+      warning(
         "Cannot proceed with ",
-        file.path(.Object@host@installationDirectory, relativePath),
+        targetPath,
         "\nStatus code is ",
         CreateRetValue$status,
         "\nstdout output is ",
         rawToChar(CreateRetValue$stdout),
         "\nstderr output is ",
-        rawToChar(CreateRetValue$stderr)
+        rawToChar(CreateRetValue$stderr),
+        call. = FALSE,
+        immediate. = TRUE
       )
       FALSE
     } else {
       TRUE
     }
   }
+
+.ssh_exec_internal_warn <- function(session,
+                                    command,
+                                    relativePath,
+                                    .Object,
+                                    targetPath = NULL) {
+  ret <- tryCatch(
+    ssh::ssh_exec_internal(session, command),
+    error = function(e) {
+      list(
+        status = 1L,
+        stdout = charToRaw(""),
+        stderr = charToRaw(conditionMessage(e))
+      )
+    }
+  )
+
+  .check_SSHExecStatusDir(
+    CreateRetValue = ret,
+    relativePath = relativePath,
+    .Object = .Object,
+    targetPath = targetPath
+  )
+  ret
+}
+
+.uploadFiles_warn <- function(.Object, remoteDir, files, contextPath) {
+  ret <- tryCatch(
+    uploadFiles(.Object = .Object, remoteDir = remoteDir, files = files),
+    error = function(e) {
+      warning(
+        "Cannot upload files to ",
+        contextPath,
+        "\nError: ",
+        conditionMessage(e),
+        call. = FALSE,
+        immediate. = TRUE
+      )
+      NULL
+    }
+  )
+  ret
+}
+
+.ensure_remote_dir_exists_or_stop <- function(session, dirPath) {
+  cmd <- paste0(
+    "if [ -d ",
+    shQuote(dirPath, type = "sh"),
+    " ] || mkdir -p ",
+    shQuote(dirPath, type = "sh"),
+    "; then echo TRUE; else echo FALSE; fi"
+  )
+
+  ret <- tryCatch(
+    ssh::ssh_exec_internal(session, cmd),
+    error = function(e) {
+      list(
+        status = 1L,
+        stdout = charToRaw(""),
+        stderr = charToRaw(conditionMessage(e))
+      )
+    }
+  )
+
+  if (ret$status != 0 || rawToChar(ret$stdout) != "TRUE\n") {
+    stop(
+      "Remote installation directory ",
+      dirPath,
+      " does not exist and cannot be created.",
+      "\nStatus code is ",
+      ret$status,
+      "\nstdout output is ",
+      rawToChar(ret$stdout),
+      "\nstderr output is ",
+      rawToChar(ret$stderr),
+      call. = FALSE
+    )
+  }
+}
 
 #' Generic function for cancelling a job
 #'

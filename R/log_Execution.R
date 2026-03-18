@@ -125,7 +125,7 @@
 
     MACs <- .get_MACAddresses()
 
-    os_type <- .get_os_distribution
+    os_type <- .get_os_distribution()
 
     Log <- list(
       eventType = "track",

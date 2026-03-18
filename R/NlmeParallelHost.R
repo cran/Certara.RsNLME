@@ -237,7 +237,7 @@ setMethod("initialize", "NlmeParallelHost",
               }
 
               if (grepl("windows", hostType, ignore.case = TRUE)) {
-                hostType <- "windows"
+                stop("Remote Windows hosts are not supported; use a Linux host (`RHEL` or `UBUNTU`).")
               } else if (grepl("(^linux$)|(^unix$)", hostType, ignore.case = TRUE)) {
                 hostType <- "linux"
               } else if (grepl("UBUNTU2204", hostType, ignore.case = TRUE)) {
@@ -247,7 +247,7 @@ setMethod("initialize", "NlmeParallelHost",
                 warning("RHEL8 as a hostType is deprecated. Use `RHEL` instead.")
                 hostType <- "RHEL"
               } else if (!toupper(hostType) %in% c("RHEL", "UBUNTU")) {
-                stop("hostType ", hostType, " is not supported; supported are `Windows`, `RHEL`, `UBUNTU`.")
+                stop("hostType ", hostType, " is not supported; supported remote host types are `RHEL` and `UBUNTU`.")
               }
             }
 

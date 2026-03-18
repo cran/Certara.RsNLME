@@ -5,16 +5,21 @@
 #' jobs.
 #'
 #' @param sharedDirectory `character`. The directory where temporary run folders
-#'   are created. Defaults to the current working directory.
+#'   are created. Defaults to the current working directory for local runs and
+#'   to `"~"` for remote runs.
 #' @param installationDirectory `character`. The directory containing NLME
-#'   libraries/scripts. Defaults to the `INSTALLDIR` environment variable.
+#'   libraries/scripts. Defaults to the `INSTALLDIR` environment variable for
+#'   local runs and to `file.path(sharedDirectory, "InstallDirNLME")` for
+#'   remote runs.
 #' @param hostName `character`. A display name for the host. Defaults to the
-#'   system's network name (from `Sys.info()[["nodename"]]`).
+#'   system's network name (from `Sys.info()[["nodename"]]`) for local runs and
+#'   to `machineName` for remote runs.
 #' @param machineName `character`. The IP address or network name of the host.
 #'   Defaults to `"127.0.0.1"`.
 #' @param hostType `character`. The host operating system. Defaults to the
-#'   current OS (`Sys.info()[["sysname"]]`). While `"windows"` or `"linux"` are
-#'   valid, for remote Linux hosts the following are officially supported:
+#'   current OS (`Sys.info()[["sysname"]]`) for local runs and to `"linux"` for
+#'   remote runs. While `"windows"` or `"linux"` are valid for local runs, for
+#'   remote Linux hosts the following are officially supported:
 #'   `"RHEL"` (for RHEL 8 and 9) and `"UBUNTU"` (for Ubuntu 22.04 and 24.04).
 #'   Specifying one of these values correctly sets the `PML_BIN_DIR` variable.
 #' @param numCores `numeric`. The number of CPU cores to utilize. Defaults to
@@ -68,8 +73,29 @@ hostParams <- function(sharedDirectory,
   parallelMethodArg <- NlmeParallelMethod(parallelMethod)
 
   if (missing(sharedDirectory)) {
-    sharedDirectory <-
-      normalizePath(".", winslash = "/", mustWork = FALSE)
+    if (isLocal) {
+      sharedDirectory <-
+        normalizePath(".", winslash = "/", mustWork = FALSE)
+    } else {
+      warning(
+        "sharedDirectory is missing for a remote host; using '~'.",
+        call. = FALSE,
+        immediate. = TRUE
+      )
+      sharedDirectory <- "~"
+    }
+  }
+
+  if (!isLocal && missing(hostName)) {
+    hostName <- machineName
+  }
+
+  if (!isLocal && missing(hostType)) {
+    hostType <- "linux"
+  }
+
+  if (!isLocal && missing(installationDirectory)) {
+    installationDirectory <- file.path(sharedDirectory, "InstallDirNLME")
   }
 
   host <- NlmeParallelHost(

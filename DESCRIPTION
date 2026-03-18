@@ -1,6 +1,6 @@
 Package: Certara.RsNLME
 Title: Pharmacometric Modeling
-Version: 3.1.0.1
+Version: 3.1.1
 Authors@R: c(person("James", "Craig", email = "james.craig@certara.com", role = c("aut", "cre")),
       person("Michael", "Tomashevskiy", email = "michael.tomashevskiy@certara.com", role = c("aut")),
       person("Vitalii", "Nazarov", email = "vitalii.nazarov@certara.com", role = c("aut")),
@@ -23,8 +23,8 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
 Suggests: rlang, knitr, rmarkdown, testthat, magrittr
-Imports: xml2, assertthat, Certara.NLME8, data.table, jsonlite,
-        methods, utils, ssh
+Imports: xml2, assertthat, Certara.NLME8 (>= 3.0.2), data.table,
+        jsonlite, methods, utils, ssh
 Collate: 'BootstrapParams.R' 'NlmeParallelMethod.R'
         'NlmeUserAuthentication.R' 'NlmeParallelHost.R'
         'SimpleNlmeJob.R' 'BootNlmeJob.R' 'CovariateEffectModel.R'
@@ -61,7 +61,7 @@ Collate: 'BootstrapParams.R' 'NlmeParallelMethod.R'
         'structural_param.r' 'tableParams.R' 'update_PMLwithThetas.R'
         'vpc.r' 'writeColumnMapping.R' 'writeDefaultFiles.R'
 NeedsCompilation: no
-Packaged: 2025-09-03 03:11:50 UTC; jcraig
+Packaged: 2026-03-17 21:09:34 UTC; jcraig
 Author: James Craig [aut, cre],
   Michael Tomashevskiy [aut],
   Vitalii Nazarov [aut],
@@ -70,4 +70,4 @@ Author: James Craig [aut, cre],
   Certara USA, Inc. [cph, fnd]
 Maintainer: James Craig <james.craig@certara.com>
 Repository: CRAN
-Date/Publication: 2025-09-03 05:20:08 UTC
+Date/Publication: 2026-03-18 06:13:33 UTC

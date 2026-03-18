@@ -22,20 +22,25 @@ hostParams(
 }
 \arguments{
 \item{sharedDirectory}{\code{character}. The directory where temporary run folders
-are created. Defaults to the current working directory.}
+are created. Defaults to the current working directory for local runs and
+to \code{"~"} for remote runs.}
 
 \item{installationDirectory}{\code{character}. The directory containing NLME
-libraries/scripts. Defaults to the \code{INSTALLDIR} environment variable.}
+libraries/scripts. Defaults to the \code{INSTALLDIR} environment variable for
+local runs and to \code{file.path(sharedDirectory, "InstallDirNLME")} for
+remote runs.}
 
 \item{hostName}{\code{character}. A display name for the host. Defaults to the
-system's network name (from \code{Sys.info()[["nodename"]]}).}
+system's network name (from \code{Sys.info()[["nodename"]]}) for local runs and
+to \code{machineName} for remote runs.}
 
 \item{machineName}{\code{character}. The IP address or network name of the host.
 Defaults to \code{"127.0.0.1"}.}
 
 \item{hostType}{\code{character}. The host operating system. Defaults to the
-current OS (\code{Sys.info()[["sysname"]]}). While \code{"windows"} or \code{"linux"} are
-valid, for remote Linux hosts the following are officially supported:
+current OS (\code{Sys.info()[["sysname"]]}) for local runs and to \code{"linux"} for
+remote runs. While \code{"windows"} or \code{"linux"} are valid for local runs, for
+remote Linux hosts the following are officially supported:
 \code{"RHEL"} (for RHEL 8 and 9) and \code{"UBUNTU"} (for Ubuntu 22.04 and 24.04).
 Specifying one of these values correctly sets the \code{PML_BIN_DIR} variable.}
 
